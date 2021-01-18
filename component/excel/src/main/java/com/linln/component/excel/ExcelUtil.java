@@ -20,10 +20,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,10 +28,9 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static java.beans.Introspector.*;
 
 /**
  * @author 小懒虫
@@ -42,7 +38,7 @@ import java.util.Map;
  */
 public class ExcelUtil {
 
-    private static int dataRow = 2;
+    private static int dataRow = 3;
     private static Cache dictCache = EhCacheUtil.getDictCache();
 
     /**
@@ -64,7 +60,7 @@ public class ExcelUtil {
     /**
      * 功能模板（标题及表头）
      */
-    private static XSSFWorkbook getCommon(String sheetTitle, List<Field> fields) {
+    private static XSSFWorkbook getCommon(String sheetTitle, List<Field> fields, List<String> fns) {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(sheetTitle);
 
@@ -98,9 +94,19 @@ public class ExcelUtil {
         thFont.setColor(IndexedColors.WHITE.getIndex());
         thStyle.setFont(thFont);
 
+        XSSFCellStyle hiddenStyle = workbook.createCellStyle();
+        hiddenStyle.setHidden(true);
+
         // 创建标题样式、表格表头
         XSSFRow titleRow = sheet.createRow(0);
         XSSFRow thsRow = sheet.createRow(1);
+        for (int j = 0; j < fns.size(); j++){
+            XSSFCell th = thsRow.createCell(j);
+            th.setCellValue(fns.get(j));
+            th.setCellStyle(hiddenStyle);
+            thsRow.setHeight((short) 0);
+        }
+        thsRow = sheet.createRow(2);
         for (int i = 0; i < fields.size(); i++) {
             Excel excel = fields.get(i).getAnnotation(Excel.class);
             XSSFCell title = titleRow.createCell(i);
@@ -206,7 +212,9 @@ public class ExcelUtil {
      * @param sheetTitle 工作组标题（文件名称）
      */
     public static void genTemplate(Class<?> entity, String sheetTitle) {
-        XSSFWorkbook workbook = getCommon(sheetTitle, getExcelList(entity, ExcelType.IMPORT));
+        List<Field> fields = getExcelList(entity, ExcelType.IMPORT);
+        List<String> fns = getFieldName(fields);
+        XSSFWorkbook workbook = getCommon(sheetTitle, fields,fns);
         download(workbook, sheetTitle + "模板");
     }
 
@@ -234,7 +242,7 @@ public class ExcelUtil {
         List<Field> fields = getExcelList(entity, ExcelType.EXPORT);
         List<String> fns = getFieldName(fields);
 
-        XSSFWorkbook workbook = getCommon(sheetTitle, fields);
+        XSSFWorkbook workbook = getCommon(sheetTitle, fields,fns);
         XSSFSheet sheet = workbook.getSheet(sheetTitle);
         XSSFCellStyle cellStyle = getCellStyle(workbook);
 
@@ -250,7 +258,7 @@ public class ExcelUtil {
 
             // 通过反射机制获取实体对象的状态
             try {
-                final BeanInfo bi = Introspector.getBeanInfo(item.getClass());
+                final BeanInfo bi = getBeanInfo(item.getClass());
                 for (final PropertyDescriptor pd : bi.getPropertyDescriptors()) {
                     if (fns.contains(pd.getName())) {
                         Object value = pd.getReadMethod().invoke(item, (Object[]) null);
@@ -267,7 +275,6 @@ public class ExcelUtil {
                                     value = dictValue.get(String.valueOf(value));
                                 }
                             }
-
                             // 获取关联对象指定的值
                             String joinField = excel.joinField();
                             if (!joinField.isEmpty()){
@@ -335,6 +342,7 @@ public class ExcelUtil {
             String[] rowData = new String[end];
             for (int i = 0; i < end; i++) {
                 Cell cell = row.getCell(i);
+
                 if(cell != null){
                     if(cell.getCellType() == CellType.NUMERIC && HSSFDateUtil.isCellDateFormatted(cell)){
                         Date date = cell.getDateCellValue();
@@ -352,7 +360,7 @@ public class ExcelUtil {
             // 将数据添加到数据列表中
             try {
                 T newInstance = entity.newInstance();
-                final BeanInfo bi = Introspector.getBeanInfo(entity);
+                final BeanInfo bi = getBeanInfo(entity);
                 for (final PropertyDescriptor pd : bi.getPropertyDescriptors()) {
                     if (fns.contains(pd.getName())) {
                         Method writeMethod = pd.getWriteMethod();
@@ -361,6 +369,7 @@ public class ExcelUtil {
                                 writeMethod.setAccessible(true);
                             }
                             String value = rowData[fns.indexOf(pd.getName())];
+                            //System.out.println(value+"----"+pd.getName());
                             if(!StringUtils.isEmpty(value)){
                                 Class<?> propertyType = pd.getPropertyType();
                                 if (String.class == propertyType){
@@ -398,5 +407,90 @@ public class ExcelUtil {
         }
 
         return list;
+    }
+
+    /**
+     * TODO:检查导入数据表的模版的合法性
+     * 检查字段名与模版的一致性
+     *
+     * List<String> fns = getFieldName(getExcelList(entity, ExcelType.IMPORT));
+     * @param row
+     * @param
+     */
+    public static <T> Boolean validateTemplate2 (Class<T> entity,Row row){
+        int end = row.getLastCellNum();
+        List<String> fns = getFieldName(getExcelList(entity, ExcelType.IMPORT));
+        final BeanInfo bi;
+        try {
+            bi = getBeanInfo(entity);
+            for (final PropertyDescriptor pd : bi.getPropertyDescriptors()) {
+                if (fns.contains(pd.getName())) {
+                    int i = fns.indexOf(pd.getName());
+                    if(!row.getCell(i).toString().equals(pd.getShortDescription().toString())){
+                        System.out.println(row.getCell(i)+fns.get(i)+pd.getShortDescription());
+                        System.out.println("该Excel文件模版不合法");
+                        return false;
+                    }
+                }
+            }
+        } catch (IntrospectionException e) {
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    public static <T> Boolean validateTemplate (Class<T> entity, InputStream inputStream){
+
+        // 读取Excel文件
+        XSSFWorkbook workbook = null;
+        try {
+            ZipSecureFile.setMinInflateRatio(-1.0d);
+            workbook = new XSSFWorkbook(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Assert.notNull(workbook, "该取Excel文件失败，请检查文件！2");
+        XSSFSheet sheet = workbook.getSheetAt(0);
+        Assert.notNull(sheet, "该Excel文件没有工作区，无法读取数据！");
+        Row row = sheet.getRow(1);//字段名行
+        if (!validateTemplate2(entity, row)) {
+            Assert.notNull(workbook, "该Excel文件模版不合法，必须使用系统导出的模版填写数据，请检查文件！");
+            return false;
+        }
+        return true;
+    }
+
+    public static <T>  void writeXLSXFile(List<T> tableData) {
+        String sheetName = "dd";
+        // @SuppressWarnings("resource")
+        XSSFWorkbook wbObj = new XSSFWorkbook();
+        XSSFSheet sheet = wbObj.createSheet(sheetName);
+
+        for (int row = 0; row < tableData.size(); row++) {
+            XSSFRow rowObj = sheet.createRow(row);
+            T rowData = tableData.get(row);
+            for (int col = 0; col < 2; col++) {
+                XSSFCell cell = rowObj.createCell(col);
+                cell.setCellValue("rowData.get(col)");
+            }
+        }
+//        FileOutputStream fileOut = new FileOutputStream("dd");
+//        wbObj.write(fileOut);
+//        wbObj.close();
+//        fileOut.flush();
+//        fileOut.close();
+        download(wbObj,"dd");
+    }
+
+    public static void test(){
+        String sheetName = "dd";
+        XSSFWorkbook wbObj = new XSSFWorkbook();
+        XSSFSheet sheet = wbObj.createSheet(sheetName);
+        XSSFRow rowObj = sheet.createRow(1);
+        XSSFCell cell = rowObj.createCell(1);
+        cell.setCellValue("1");
+        download(wbObj,"test");
+        System.out.println("download");
     }
 }

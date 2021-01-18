@@ -16,5 +16,6 @@
 
     <modules>
         <module>system</module>
+        <module>protectArea</module>
     </modules>
 </project>

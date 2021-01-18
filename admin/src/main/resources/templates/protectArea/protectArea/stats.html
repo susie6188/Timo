@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:mo="https://gitee.com/aun/Timo">
+<head th:replace="/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+<div class="layui-card">
+    <div class="layui-card-header">柱形图</div>
+    <div class="layui-card-body">
+        <div id="echartZhu" style="width: 500px;height: 500px;"></div>
+    </div>
+</div>
+<script th:replace="/common/template :: script"></script>
+<script th:src="@{/js/stats.js}" charset="utf-8"></script>
+</body>
+</html>

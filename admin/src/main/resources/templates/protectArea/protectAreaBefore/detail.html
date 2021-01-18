@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+    <div class="timo-detail-page">
+        <div class="timo-detail-title">基本信息</div>
+        <table class="layui-table timo-detail-table">
+            <colgroup>
+                <col width="100px"><col>
+                <col width="100px"><col>
+            </colgroup>
+            <tbody>
+                <tr>
+                    <th>主键ID</th>
+                    <td th:text="${protectAreaBefore.id}"></td>
+                    <th>名称</th>
+                    <td th:text="${protectAreaBefore.name}"></td>
+                </tr>
+                <tr>
+                    <th>级别</th>
+                    <td th:text="${protectAreaBefore.level}"></td>
+                    <th>类型</th>
+                    <td th:text="${protectAreaBefore.category}"></td>
+                </tr>
+                <tr>
+                    <th>经度范围</th>
+                    <td th:text="${protectAreaBefore.longitude}"></td>
+                    <th>纬度范围</th>
+                    <td th:text="${protectAreaBefore.latitude}"></td>
+                </tr>
+                <tr>
+                    <th>四至范围</th>
+                    <td th:text="${protectAreaBefore.fourRange}"></td>
+                    <th>始建面积（公顷）</th>
+                    <td th:text="${protectAreaBefore.initialArea}"></td>
+                </tr>
+                <tr>
+                    <th>现状面积（公顷）</th>
+                    <td th:text="${protectAreaBefore.currentArea}"></td>
+                    <th>陆地面积（公顷）</th>
+                    <td th:text="${protectAreaBefore.landArea}"></td>
+                </tr>
+                <tr>
+                    <th>海域面积（公顷）</th>
+                    <td th:text="${protectAreaBefore.seaArea}"></td>
+                    <th>始建时间（年）</th>
+                    <td th:text="${protectAreaBefore.originalTime}"></td>
+                </tr>
+                <tr>
+                    <th>始建文号</th>
+                    <td th:text="${protectAreaBefore.originalDocumentNo}"></td>
+                    <th>晋升省级时间（年）</th>
+                    <td th:text="${protectAreaBefore.promotionProvincialLevelTime}"></td>
+                </tr>
+                <tr>
+                    <th>晋升省级面积（公顷）</th>
+                    <td th:text="${protectAreaBefore.promotionProvincialLevelArea}"></td>
+                    <th>晋升省级文号</th>
+                    <td th:text="${protectAreaBefore.promotionProvincialLevelNo}"></td>
+                </tr>
+                <tr>
+                    <th>晋升国家级时间（年）</th>
+                    <td th:text="${protectAreaBefore.promotionNationalLevelTime}"></td>
+                    <th>晋升国家级面积（公顷）</th>
+                    <td th:text="${protectAreaBefore.promotionNationalLevelArea}"></td>
+                </tr>
+                <tr>
+                    <th>晋升国家级文号</th>
+                    <td th:text="${protectAreaBefore.promotionNationalLevelNo}"></td>
+                    <th>所在省</th>
+                    <td th:text="${protectAreaBefore.province}"></td>
+                </tr>
+                <tr>
+                    <th>所在市</th>
+                    <td th:text="${protectAreaBefore.city}"></td>
+                    <th>所在县</th>
+                    <td th:text="${protectAreaBefore.county}"></td>
+                </tr>
+                <tr>
+                    <th>主要保护对象</th>
+                    <td th:text="${protectAreaBefore.protectedObjects}"></td>
+                    <th>是否独立管理机构</th>
+                    <td th:text="${protectAreaBefore.isIndependentInstitution}"></td>
+                </tr>
+                <tr>
+                    <th>管理机构级别</th>
+                    <td th:text="${protectAreaBefore.institutionLevel}"></td>
+                    <th>管理机构成立时间（年）</th>
+                    <td th:text="${protectAreaBefore.institutionEstablishmentTime}"></td>
+                </tr>
+                <tr>
+                    <th>管理机构性质</th>
+                    <td th:text="${protectAreaBefore.institutionNature}"></td>
+                    <th>管理机构名称</th>
+                    <td th:text="${protectAreaBefore.institutionName}"></td>
+                </tr>
+                <tr>
+                    <th>管理机构隶属</th>
+                    <td th:text="${protectAreaBefore.institutionAffiliation}"></td>
+                    <th>是否有总规</th>
+                    <td th:text="${protectAreaBefore.isMasterPlan}"></td>
+                </tr>
+                <tr>
+                    <th>总规批复时间</th>
+                    <td th:text="${protectAreaBefore.replyTime}"></td>
+                    <th>功能分区</th>
+                    <td th:text="${protectAreaBefore.functionalPartition}"></td>
+                </tr>
+                <tr>
+                    <th>整合情况</th>
+                    <td th:text="${protectAreaBefore.integration}" colspan="3"></td>
+                </tr>
+                <tr>
+                    <th>创建者</th>
+                    <td th:text="${protectAreaBefore.createBy?.nickname}"></td>
+                    <th>更新者</th>
+                    <td th:text="${protectAreaBefore.updateBy?.nickname}"></td>
+                </tr>
+                <tr>
+                    <th>创建时间</th>
+                    <td th:text="${#dates.format(protectAreaBefore.createDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <th>更新时间</th>
+                    <td th:text="${#dates.format(protectAreaBefore.updateDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+<script th:replace="/common/template :: script"></script>
+</body>
+</html>
