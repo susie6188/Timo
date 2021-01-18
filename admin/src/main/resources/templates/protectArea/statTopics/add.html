@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+    <div class="layui-form timo-compile">
+    <form th:action="@{/protectArea/statTopics/save}">
+        <input type="hidden" name="id" th:if="${statTopics}" th:value="${statTopics.id}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">统计专题名称</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="topics" placeholder="请输入统计专题名称" th:value="${statTopics?.topics}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">子专题名称</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="subTopics" placeholder="请输入子专题名称" th:value="${statTopics?.subTopics}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">涉及省份</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="province" placeholder="请输入涉及省份" th:value="${statTopics?.province}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">涉及区县</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="county" placeholder="请输入涉及区县" th:value="${statTopics?.county}">
+            </div>
+        </div>
+        <div class="layui-form-item timo-finally">
+            <button class="layui-btn ajax-submit"><i class="fa fa-check-circle"></i> 保存</button>
+            <button class="layui-btn btn-secondary close-popup"><i class="fa fa-times-circle"></i> 关闭</button>
+        </div>
+    </form>
+</div>
+<script th:replace="/common/template :: script"></script>
+</body>
+</html>
