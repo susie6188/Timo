@@ -3,6 +3,7 @@ package com.linln.modules.protectArea.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linln.common.enums.StatusEnum;
 import com.linln.common.utils.StatusUtil;
+import com.linln.component.excel.annotation.Excel;
 import com.linln.modules.system.domain.User;
 import lombok.Data;
 import org.hibernate.annotations.NotFound;
@@ -103,6 +104,9 @@ public class ProtectAreaBefore implements Serializable {
     private String functionalPartition;
     // 整合情况
     private String integration;
+    // 备注
+    @Excel("备注")
+    private String remarks;
     // 创建时间
     @CreatedDate
     private Date createDate;
