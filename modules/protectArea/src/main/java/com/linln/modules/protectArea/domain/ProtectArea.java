@@ -61,16 +61,16 @@ public class ProtectArea implements Serializable {
     // 四至范围
     @Excel("四至范围")
     private String fourRange;
-    // 始建面积（公顷）
+    // 始建面积（平方公里）
     @Excel("始建面积（平方公里）")
     private Double initialArea;
-    // 现状面积（公顷）
+    // 现状面积（平方公里）
     @Excel("现状面积（平方公里）")
     private Double currentArea;
-    // 陆地面积（公顷）
+    // 陆地面积（平方公里）
     @Excel("陆地面积（平方公里）")
     private Double landArea;
-    // 海域面积（公顷）
+    // 海域面积（平方公里）
     @Excel("海域面积（平方公里）")
     private Double seaArea;
     // 始建时间（年）

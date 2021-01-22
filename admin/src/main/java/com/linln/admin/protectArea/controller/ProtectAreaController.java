@@ -25,7 +25,10 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.List;
 
@@ -243,5 +246,15 @@ public class ProtectAreaController {
     @RequiresPermissions("protectArea:protectArea:stats")
     public String stats(){
         return "/protectArea/protectArea/stats";
+    }
+
+    @GetMapping("test")
+    public String test(HttpServletRequest request){
+        ServletContext application = RequestContextUtils.findWebApplicationContext(request)
+                .getServletContext();
+
+        application.setAttribute("test","dd");
+
+        return "/protectArea/protectArea/test";
     }
 }

@@ -72,4 +72,9 @@ public class ProtectAreaServiceImpl implements ProtectAreaService {
         return protectAreaRepository.getLevel();
     }
 
+    @Override
+    public List getCategory() {
+        return protectAreaRepository.getCategory();
+    }
+
 }

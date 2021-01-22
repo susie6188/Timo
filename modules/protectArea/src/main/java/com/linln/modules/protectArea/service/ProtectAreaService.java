@@ -47,4 +47,10 @@ public interface ProtectAreaService {
      */
     List getLevel();
 
+    /**
+     * 查询保护地类别
+     * @return
+     */
+    List getCategory();
+
 }

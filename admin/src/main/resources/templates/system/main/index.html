@@ -54,7 +54,8 @@
             font-size: 18px;
         }
         .widget-small-info span{
-            font-size: 16px;
+            font-size: 8px;
+            color: darkred;
         }
         .project-introduce{
             min-height: 466px;
@@ -79,106 +80,98 @@
             background-color: #d9edf7;
             border-color: #bce8f1;
         }
+        .info{
+            font-size: 6px;
+        }
     </style>
 </head>
 <body class="timo-layout-page">
 <div class="layui-row layui-col-space15">
-    <div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+    <div class="layui-col-md4 layui-col-sm8 layui-col-xs12">
         <div class="widget-small widget-pa">
             <i class="icon fa fa-users fa-3x"></i>
             <div class="widget-small-info">
                 <h4>保护地</h4>
-                <span>1,112</span>
+                <span th:text="${count}+'个'"></span>
             </div>
         </div>
     </div>
-    <div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+    <div class="layui-col-md4 layui-col-sm8 layui-col-xs12">
         <div class="widget-small widget-area">
             <i class="icon fa fa-line-chart fa-3x"></i>
             <div class="widget-small-info">
                 <h4>总保护面积</h4>
-                <span>10000(公顷)</span>
+                <span th:text="${areas}+'平方公里'"></span>
             </div>
         </div>
     </div>
-    <div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
-        <div class="widget-small widget-area">
-            <i class="icon fa fa-area-chart fa-3x"></i>
-            <div class="widget-small-info">
-                <h4>陆地面积</h4>
-                <span>4100(公顷)</span>
-            </div>
-        </div>
-    </div>
-    <div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
-        <div class="widget-small widget-area">
-            <i class="icon fa fa-area-chart fa-3x"></i>
-            <div class="widget-small-info">
-                <h4>海域面积</h4>
-                <span>4100(公顷)</span>
-            </div>
-        </div>
-    </div>
-    <div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+    <div class="layui-col-md4 layui-col-sm8 layui-col-xs12">
         <div class="widget-small widget-type">
             <i class="icon fa fa-envira fa-3x"></i>
             <div class="widget-small-info">
                 <h4>风景自然公园</h4>
-                <span>306</span>
+                <span th:text="${a1}+'个'"></span>
+                <span th:text="'('+${c1}+'平方公里)'"></span>
             </div>
         </div>
     </div>
-    <div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+    <div class="layui-col-md4 layui-col-sm8 layui-col-xs12">
         <div class="widget-small widget-type">
             <i class="icon fa fa-tree fa-3x"></i>
             <div class="widget-small-info">
                 <h4>森林自然公园</h4>
-                <span>306</span>
+                <span th:text="${a2}+'个'"></span>
+                <span th:text="'('+${c2}+'平方公里)'"></span>
             </div>
         </div>
     </div>
-    <div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+    <div class="layui-col-md4 layui-col-sm8 layui-col-xs12">
         <div class="widget-small widget-type">
             <i class="icon fa fa-first-order fa-3x"></i>
             <div class="widget-small-info">
                 <h4>地质自然公园</h4>
-                <span>306</span>
+                <span th:text="${a3}+'个'"></span>
+                <span th:text="'('+${c3}+'平方公里)'"></span>
             </div>
         </div>
     </div>
-    <div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+    <div class="layui-col-md4 layui-col-sm8 layui-col-xs12">
         <div class="widget-small widget-type">
             <i class="icon fa fa-yelp fa-3x"></i>
             <div class="widget-small-info">
                 <h4>湿地自然公园</h4>
-                <span>306</span>
+                <span th:text="${a4}+'个'"></span>
+                <span th:text="'('+${c4}+'平方公里)'"></span>
             </div>
         </div>
     </div>
-    <div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+    <div class="layui-col-md4 layui-col-sm8 layui-col-xs12">
         <div class="widget-small widget-type">
             <i class="icon fa fa-bars fa-3x"></i>
             <div class="widget-small-info">
                 <h4>海洋自然公园</h4>
-                <span>306</span>
+                <span th:text="${a5}+'个'"></span>
+                <span th:text="'('+${c5}+'平方公里)'"></span>
             </div>
         </div>
     </div>
-    <div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+    <div class="layui-col-md4 layui-col-sm8 layui-col-xs12">
         <div class="widget-small widget-type">
             <i class="icon fa fa-circle fa-3x"></i>
             <div class="widget-small-info">
                 <h4>沙漠自然公园</h4>
-                <span>306</span>
+                <span th:text="${a6}+'个'"></span>
+                <span th:text="'('+${c6}+'平方公里)'"></span>
             </div>
         </div>
     </div>
-    <div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+    <div class="layui-col-md4 layui-col-sm8 layui-col-xs12">
         <div class="widget-small widget-type">
             <i class="icon fa fa-leaf fa-3x"></i>
             <div class="widget-small-info">
                 <h4>草原自然公园</h4>
-                <span>306</span>
+                <span th:text="${a7}+'个'"></span>
+                <span th:text="'('+${c7!=null?c7:'0'}+'平方公里)'"></span>
             </div>
         </div>
     </div>

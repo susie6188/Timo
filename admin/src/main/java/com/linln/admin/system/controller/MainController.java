@@ -11,6 +11,7 @@ import com.linln.common.utils.ResultVoUtil;
 import com.linln.common.utils.SpringContextUtil;
 import com.linln.common.vo.ResultVo;
 import com.linln.component.shiro.ShiroUtil;
+import com.linln.modules.protectArea.repository.ProtectAreaRepository;
 import com.linln.modules.system.domain.Menu;
 import com.linln.modules.system.domain.Role;
 import com.linln.modules.system.domain.Upload;
@@ -29,7 +30,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +51,9 @@ public class MainController{
 
     @Autowired
     private MenuService menuService;
+
+    @Autowired
+    private ProtectAreaRepository protectAreaRepository;
 
     /**
      * 后台主体内容
@@ -101,6 +108,33 @@ public class MainController{
     @GetMapping("/index")
     @RequiresPermissions("index")
     public String index(Model model){
+
+//        List category = protectAreaRepository.getCategory();
+//        for(Object cat:category){
+//            model.addAttribute((String) cat,protectAreaRepository.getAreaStatsByCategory((String) cat));
+//        }
+        model.addAttribute("c1",protectAreaRepository.getAreaStatsByCategory("风景自然公园"));
+        model.addAttribute("c2",protectAreaRepository.getAreaStatsByCategory("森林自然公园"));
+        model.addAttribute("c3",protectAreaRepository.getAreaStatsByCategory("地质自然公园"));
+        model.addAttribute("c4",protectAreaRepository.getAreaStatsByCategory("湿地自然公园"));
+        model.addAttribute("c5",protectAreaRepository.getAreaStatsByCategory("海洋自然公园"));
+        model.addAttribute("c6",protectAreaRepository.getAreaStatsByCategory("沙漠自然公园"));
+        model.addAttribute("c7",protectAreaRepository.getAreaStatsByCategory("草原自然公园"));
+
+        model.addAttribute("a1",protectAreaRepository.getCountStatsByCategory("风景自然公园"));
+        model.addAttribute("a2",protectAreaRepository.getCountStatsByCategory("森林自然公园"));
+        model.addAttribute("a3",protectAreaRepository.getCountStatsByCategory("地质自然公园"));
+        model.addAttribute("a4",protectAreaRepository.getCountStatsByCategory("湿地自然公园"));
+        model.addAttribute("a5",protectAreaRepository.getCountStatsByCategory("海洋自然公园"));
+        model.addAttribute("a6",protectAreaRepository.getCountStatsByCategory("沙漠自然公园"));
+        model.addAttribute("a7",protectAreaRepository.getCountStatsByCategory("草原自然公园"));
+
+        model.addAttribute("count",protectAreaRepository.getCount());
+        model.addAttribute("areas",protectAreaRepository.getAreaStats());
+
+
+        String dd = "dd";
+        model.addAttribute("dd", dd);
         return "/system/main/index";
     }
 
