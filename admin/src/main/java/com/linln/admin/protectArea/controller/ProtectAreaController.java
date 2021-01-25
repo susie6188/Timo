@@ -10,6 +10,7 @@ import com.linln.component.excel.ExcelUtil;
 import com.linln.component.excel.annotation.Excel;
 import com.linln.component.fileUpload.FileUpload;
 import com.linln.devtools.generate.GenerateController;
+import com.linln.modules.protectArea.domain.Area;
 import com.linln.modules.protectArea.domain.ProtectArea;
 import com.linln.modules.protectArea.service.ProtectAreaService;
 import com.linln.modules.system.domain.Upload;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.util.ResourceUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -241,7 +243,7 @@ public class ProtectAreaController {
 
     @GetMapping("stats")
     @RequiresPermissions("protectArea:protectArea:stats")
-    public String stats(){
+    public String stats(ModelMap model){
         return "/protectArea/protectArea/stats";
     }
 }

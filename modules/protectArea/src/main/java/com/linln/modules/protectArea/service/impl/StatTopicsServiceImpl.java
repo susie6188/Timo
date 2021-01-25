@@ -2,6 +2,8 @@ package com.linln.modules.protectArea.service.impl;
 
 import com.linln.common.data.PageSort;
 import com.linln.common.enums.StatusEnum;
+import com.linln.modules.protectArea.domain.ITopicTO;
+import com.linln.modules.protectArea.domain.ProtectArea;
 import com.linln.modules.protectArea.domain.StatTopics;
 import com.linln.modules.protectArea.repository.StatTopicsRepository;
 import com.linln.modules.protectArea.service.StatTopicsService;
@@ -9,9 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,5 +69,57 @@ public class StatTopicsServiceImpl implements StatTopicsService {
     @Transactional
     public Boolean updateStatus(StatusEnum statusEnum, List<Long> idList) {
         return statTopicsRepository.updateStatus(statusEnum.getCode(), idList) > 0;
+    }
+
+    @Override
+    public List<ITopicTO> findTopics() {
+        return statTopicsRepository.findTopics();
+    }
+
+    @Override
+    public List<ITopicTO> findSubTopics(String topic) {
+        return statTopicsRepository.findSubTopics(topic);
+    }
+
+    private Specification<StatTopics> getSpec(String topic, String subTopic){
+        Specification<StatTopics> spec = new Specification<StatTopics>(){
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Predicate toPredicate(Root<StatTopics> root,
+                                         CriteriaQuery<?> query,
+                                         CriteriaBuilder cb){
+                Path<String> topicsPath = root.get("topics");
+                Path<String> subTopicsPath = root.get("subTopics");
+
+                List<Predicate> predicates = new ArrayList<Predicate>();
+                if(topic != null ) {
+                    predicates.add(cb.like(topicsPath, "%" + topic + "%"));
+                }
+
+                if(subTopic != null ) {
+                    predicates.add(cb.like(subTopicsPath, "%" + subTopic + "%"));
+                }
+
+                Predicate[] array = new Predicate[predicates.size()];
+                query.where(predicates.toArray(array));
+
+                return null;
+            }
+        };
+
+        return spec;
+    }
+
+    @Override
+    public List<StatTopics> findAll(String topic, String subTopic) {
+        Specification<StatTopics> spec = getSpec(topic, subTopic);
+        return statTopicsRepository.findAll(spec);
+    }
+
+    @Override
+    public long count(String topic, String subTopic){
+        Specification<StatTopics> spec = getSpec(topic, subTopic);
+        return statTopicsRepository.count(spec);
     }
 }

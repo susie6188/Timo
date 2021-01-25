@@ -1,6 +1,8 @@
 package com.linln.modules.protectArea.service;
 
 import com.linln.common.enums.StatusEnum;
+import com.linln.modules.protectArea.domain.IAdcodeTO;
+import com.linln.modules.protectArea.domain.ITopicTO;
 import com.linln.modules.protectArea.domain.StatTopics;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -38,4 +40,11 @@ public interface StatTopicsService {
      */
     @Transactional
     Boolean updateStatus(StatusEnum statusEnum, List<Long> idList);
+
+    List<ITopicTO> findTopics();
+
+    List<ITopicTO> findSubTopics(String topic);
+
+    List<StatTopics> findAll(String topic, String subTopic);
+    long count(String topic, String subTopic);
 }
