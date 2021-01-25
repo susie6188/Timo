@@ -53,4 +53,8 @@ public interface ProtectAreaService {
      */
     List getCategory();
 
+    List<ProtectArea> findAll();
+
+    List<ProtectArea> findAllByDistrict(String[] provinces, String[] cities, String[] counties, String protectedObjects, int startYear, int endYear);
+    long countByDistrict(String[] provinces, String[] cities, String[] counties, String protectedObjects, int startYear, int endYear);
 }

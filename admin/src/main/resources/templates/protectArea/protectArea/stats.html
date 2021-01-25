@@ -3,14 +3,183 @@
       xmlns:mo="https://gitee.com/aun/Timo">
 <head th:replace="/common/template :: header(~{::title},~{::link},~{::style})">
 </head>
-<body>
-<div class="layui-card">
-    <div class="layui-card-header">柱形图</div>
-    <div class="layui-card-body">
-        <div id="echartZhu" style="width: 500px;height: 500px;"></div>
+
+<div class="timo-layout-page">
+    <div class="layui-card">
+        <div class="layui-card-header timo-card-header">
+            <span><i class="fa fa-bars"></i>统计保护地</span>
+            <i class="layui-icon layui-icon-refresh refresh-btn"></i>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-row timo-card-screen">
+                <div class="pull-left layui-form-pane timo-search-box">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">统计区域</label>
+                        <div class="layui-input-block timo-search-status">
+                            <select class="timo-search-select" id="regionType" name="regionType" style="width: 120px;">
+                                <option value="district">行政区</option>
+                                <option value="topic">专题区域</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-inline" id="regionDistrict">
+                        <label class="layui-form-label">省</label>
+                        <div class="layui-input-block timo-search-status">
+                            <input id="adcode" name="adcode" th:type="hidden"></input>
+                            <select class="timo-search-select" id="province" name="province" style="width: 120px;"></select>
+                        </div>
+                        <label class="layui-form-label">市</label>
+                        <div class="layui-input-block timo-search-status">
+                            <select class="timo-search-select" id="city" name="city">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                        <label class="layui-form-label">县</label>
+                        <div class="layui-input-block timo-search-status">
+                            <select class="timo-search-select" id="county" name="county">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-inline" id="regionTopic" style="display: none;">
+                        <label class="layui-form-label">流域</label>
+                        <div class="layui-input-block timo-search-status">
+                            <select class="timo-search-select" id="topic" name="topic"></select>
+                        </div>
+                        <label class="layui-form-label">子流域</label>
+                        <div class="layui-input-block timo-search-status">
+                            <select class="timo-search-select" id="subTopic" name="subTopic">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-inline">
+                        <label class="layui-form-label">保护对象</label>
+                        <div class="layui-input-block timo-search-status">
+                            <select class="timo-search-select" id="protectedObjects" name="protectedObjects">
+                                <option value="">全部</option>
+                                <option value="自然风景资源及历史文化资源">自然风景资源及历史文化资源</option>
+                                <option value="森林生态系统和森林景观">森林生态系统和森林景观</option>
+                                <option value="森林生态系统和森林景观">湿地生态系统以及动植物</option>
+                                <option value="地质遗迹和地质景观">地质遗迹和地质景观</option>
+                                <option value="海洋生态系统">海洋生态系统</option>
+                                <option value="沙漠生态系统以及沙漠景观">沙漠生态系统以及沙漠景观</option>
+                                <option value="石漠生态系统以及石漠景观">石漠生态系统以及石漠景观</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-inline">
+                        <label class="layui-form-label">起始时间</label>
+                        <div class="layui-input-block timo-search-status">
+                            <select class="timo-search-select" id="startYear" name="startYear">
+                                <option value="-1">全部</option>
+                                <option value="2000">2000</option>
+                                <option value="2001">2001</option>
+                                <option value="2002">2002</option>
+                                <option value="2003">2003</option>
+                                <option value="2004">2004</option>
+                                <option value="2005">2005</option>
+                                <option value="2006">2006</option>
+                                <option value="2007">2007</option>
+                                <option value="2008">2008</option>
+                                <option value="2009">2009</option>
+                                <option value="2010">2010</option>
+                                <option value="2011">2011</option>
+                                <option value="2012">2012</option>
+                                <option value="2013">2013</option>
+                                <option value="2014">2014</option>
+                                <option value="2015">2015</option>
+                                <option value="2016">2016</option>
+                                <option value="2017">2017</option>
+                                <option value="2018">2018</option>
+                                <option value="2019">2019</option>
+                                <option value="2020">2020</option>
+                            </select>
+                        </div>
+                        <label class="layui-form-label">结束时间</label>
+                        <div class="layui-input-block timo-search-status">
+                            <select class="timo-search-select" id="endYear" name="endYear">
+                                <option value="-1">全部</option>
+                                <option value="2000">2000</option>
+                                <option value="2001">2001</option>
+                                <option value="2002">2002</option>
+                                <option value="2003">2003</option>
+                                <option value="2004">2004</option>
+                                <option value="2005">2005</option>
+                                <option value="2006">2006</option>
+                                <option value="2007">2007</option>
+                                <option value="2008">2008</option>
+                                <option value="2009">2009</option>
+                                <option value="2010">2010</option>
+                                <option value="2011">2011</option>
+                                <option value="2012">2012</option>
+                                <option value="2013">2013</option>
+                                <option value="2014">2014</option>
+                                <option value="2015">2015</option>
+                                <option value="2016">2016</option>
+                                <option value="2017">2017</option>
+                                <option value="2018">2018</option>
+                                <option value="2019">2019</option>
+                                <option value="2020">2020</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="pull-right screen-btn-group">
+                    <button class="layui-btn" data-title="查询" id="query" data-size="auto">
+                        <i class="layui-icon layui-icon-table"></i>查询</button>
+                    <button class="layui-btn" data-title="重置" id="reset" data-size="auto">
+                        <i class="layui-icon layui-icon-file"></i>重置</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="layui-card">
+        <div class="layui-card-header">统计图</div>
+        <div class="layui-card-body layui-row">
+            <div id="provinceChart" class="layui-col-md6" style="height: 500px;"></div>
+            <div id="protectedObjectsChart" class="layui-col-md6" style="height: 500px;"></div>
+        </div>
+    </div>
+
+    <div class="layui-card">
+        <div class="layui-card-header">数据表</div>
+        <div class="layui-card-body">
+            <div class="timo-table-wrap">
+                <table id="table" class="layui-table timo-table">
+<!--                    <thead>-->
+<!--                    <tr>-->
+<!--                        <th>名称</th>-->
+<!--                        <th>级别</th>-->
+<!--                        <th>类型</th>-->
+<!--                        <th>现状面积（平方公里）</th>-->
+<!--                        <th>所在省</th>-->
+<!--                        <th>所在市</th>-->
+<!--                        <th>所在县</th>-->
+<!--                        <th>主要保护对象</th>-->
+<!--                        <th>总规批复时间</th>-->
+<!--                        <th>功能分区</th>-->
+<!--                        <th>整合优化前保护地名称</th>-->
+<!--                    </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+
+<!--                    </tbody>-->
+                </table>
+            </div>
+        </div>
+    </div>
+
 </div>
+
 <script th:replace="/common/template :: script"></script>
+<script th:src="@{/js/plugins/jquery-3.3.1.min.js}" charset="utf-8"></script>
 <script th:src="@{/js/stats.js}" charset="utf-8"></script>
+
 </body>
 </html>

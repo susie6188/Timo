@@ -20,6 +20,11 @@
             <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.75</version>
+        </dependency>
         <!--开发模块，上线部署可以注释掉-->
         <dependency>
             <groupId>com.linln</groupId>

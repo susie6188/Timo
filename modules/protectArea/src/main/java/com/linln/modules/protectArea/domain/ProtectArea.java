@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linln.common.enums.StatusEnum;
 import com.linln.common.utils.StatusUtil;
 import com.linln.component.excel.annotation.Excel;
-import com.linln.component.excel.enums.ExcelType;
 import com.linln.modules.system.domain.User;
 import lombok.Data;
 import org.hibernate.annotations.NotFound;
@@ -18,15 +17,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import java.util.List;
+import javax.persistence.*;
+
+import static javax.persistence.FetchType.LAZY;
 
 /**
  * @author susie
@@ -150,18 +144,29 @@ public class ProtectArea implements Serializable {
     private Date updateDate;
     // 创建者
     @CreatedBy
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch= LAZY)
     @NotFound(action=NotFoundAction.IGNORE)
     @JoinColumn(name="create_by")
     @JsonIgnore
     private User createBy;
     // 更新者
     @LastModifiedBy
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch= LAZY)
     @NotFound(action=NotFoundAction.IGNORE)
     @JoinColumn(name="update_by")
     @JsonIgnore
     private User updateBy;
     // 数据状态
     private Byte status = StatusEnum.OK.getCode();
+
+    @OneToMany(fetch= LAZY)
+    private List<ProjectAreaLocation> locations;
+
+    public List<ProjectAreaLocation> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(List<ProjectAreaLocation> locations) {
+        this.locations = locations;
+    }
 }
