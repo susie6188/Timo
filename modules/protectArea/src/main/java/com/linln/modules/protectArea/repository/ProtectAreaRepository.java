@@ -29,7 +29,6 @@ public interface ProtectAreaRepository extends BaseRepository<ProtectArea, Long>
     List getAreaStatsByLevel();
 
 
-
     @Query(nativeQuery = true,value = "" +
             "select ROUND(sum(pa.current_area),2) as currentAreaSum from pa_protect_area pa"
     )
