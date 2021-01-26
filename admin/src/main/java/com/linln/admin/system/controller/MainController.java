@@ -133,8 +133,6 @@ public class MainController{
         model.addAttribute("areas",protectAreaRepository.getAreaStats());
 
 
-        String dd = "dd";
-        model.addAttribute("dd", dd);
         return "/system/main/index";
     }
 
