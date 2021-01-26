@@ -15,8 +15,8 @@ layui.config({
         elem: '#table'
         ,url: ''
         ,page: false
-        // ,totalRow: true
-        // ,toolbar: true
+        ,totalRow: true
+        ,toolbar: true
         ,cols: [[
             {type: 'numbers', title: '序号', totalRowText: '合计'}
             ,{field: 'name', title: '名称'}
@@ -27,7 +27,7 @@ layui.config({
             ,{field: 'county', title: '所在县'}
             ,{field: 'protectedObjects', title: '主要保护对象'}
             ,{field: 'currentArea', title: '现状面积(平方公里)', totalRow: true, templet: function(d){
-                    return d.currentArea.toFixed(2);
+                    return Number(d.currentArea).toFixed(2);
                 }}
         ]]
     };
