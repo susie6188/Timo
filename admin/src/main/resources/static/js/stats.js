@@ -14,19 +14,21 @@ layui.config({
     var myTableOption = {
         elem: '#table'
         ,url: ''
-        ,page: false //分页
-        ,cols: [[ //表头
-            {field: 'name', title: '名称', width:80}
-            ,{field: 'level', title: '级别', width:80}
-            ,{field: 'category', title: '类型', width:80}
-            ,{field: 'currentArea', title: '现状面积', width: 80}
-            ,{field: 'province', title: '所在省', width: 80}
-            ,{field: 'city', title: '所在市', width: 80}
-            ,{field: 'county', title: '所在县', width: 80}
+        ,page: false
+        // ,totalRow: true
+        // ,toolbar: true
+        ,cols: [[
+            {type: 'numbers', title: '序号', totalRowText: '合计'}
+            ,{field: 'name', title: '名称'}
+            ,{field: 'level', title: '级别'}
+            ,{field: 'category', title: '类型'}
+            ,{field: 'province', title: '所在省'}
+            ,{field: 'city', title: '所在市'}
+            ,{field: 'county', title: '所在县'}
             ,{field: 'protectedObjects', title: '主要保护对象'}
-            ,{field: 'replyTime', title: '总规批复时间'}
-            ,{field: 'functionalPartition', title: '功能分区'}
-            ,{field: 'nameBefore', title: '整合优化前保护地名称'}
+            ,{field: 'currentArea', title: '现状面积(平方公里)', totalRow: true, templet: function(d){
+                    return d.currentArea.toFixed(2);
+                }}
         ]]
     };
 
@@ -133,7 +135,6 @@ layui.config({
                     }]
                 };
                 provinceChart.setOption(provinceChartOption, true);
-
 
                 var protectedObjectsData = data.protectedObjectsData;
                 var protectedObjectsXData = new Array();

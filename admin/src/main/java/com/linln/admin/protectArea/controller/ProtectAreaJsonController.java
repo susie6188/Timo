@@ -125,10 +125,11 @@ public class ProtectAreaJsonController {
             }
 
             provinces = provinceList.toArray(new String[0]);
+            cities = cityList.toArray(new String[0]);
             counties = countyList.toArray(new String[0]);
         }
         data = protectAreaService.findAllByDistrict(provinces, cities, counties, protectedObjects, startYear, endYear);
-        count = protectAreaService.countByDistrict(provinces, cities, counties, protectedObjects, startYear,endYear);
+//        count = protectAreaService.countByDistrict(provinces, cities, counties, protectedObjects, startYear,endYear);
 
         JSONArray provinceData = new JSONArray();
         List<String> provinceList = new ArrayList<>();
@@ -142,27 +143,34 @@ public class ProtectAreaJsonController {
 
         for(int i=0;i<data.size();i++){
             // province
-            if(!provinceList.contains(data.get(i).getProvince())){
-                provinceList.add(data.get(i).getProvince());
+            String provinceName = data.get(i).getProvince().trim();
+            String protectedObjectsString = data.get(i).getProtectedObjects().trim();
+            long id = data.get(i).getId();
+            double currentArea = data.get(i).getCurrentArea();
+
+            if(!provinceList.contains(provinceName)){
+                provinceList.add(provinceName);
                 provinceCountList.add(1);
-                provinceAreaList.add(data.get(i).getCurrentArea());
+                provinceAreaList.add(currentArea);
             }
             else{
-                int index = provinceList.indexOf(data.get(i).getProvince());
+                int index = provinceList.indexOf(provinceName);
                 provinceCountList.set(index, provinceCountList.get(index) + 1);
-                provinceAreaList.set(index, provinceAreaList.get(index) + data.get(i).getCurrentArea());
+                provinceAreaList.set(index, provinceAreaList.get(index) + currentArea);
             }
 
             // protectedObjects
-            if(!protectedObjectsList.contains(data.get(i).getProtectedObjects())){
-                protectedObjectsList.add(data.get(i).getProtectedObjects());
+            if(!protectedObjectsList.contains(protectedObjectsString)){
+                protectedObjectsList.add(protectedObjectsString);
                 protectedObjectsCountList.add(1);
-                protectedObjectsAreaList.add(data.get(i).getCurrentArea());
+                protectedObjectsAreaList.add(currentArea);
             }
             else{
-                int index = protectedObjectsList.indexOf(data.get(i).getProtectedObjects());
+                int index = protectedObjectsList.indexOf(protectedObjectsString);
                 protectedObjectsCountList.set(index, protectedObjectsCountList.get(index) + 1);
-                protectedObjectsAreaList.set(index, protectedObjectsAreaList.get(index) + data.get(i).getCurrentArea());
+                double beforeArea = protectedObjectsAreaList.get(index);
+                double area = currentArea + beforeArea;
+                protectedObjectsAreaList.set(index, area);
             }
         }
 
@@ -177,7 +185,6 @@ public class ProtectAreaJsonController {
         JSONObject result = new JSONObject();
         result.put("provinceData", provinceData);
         result.put("protectedObjectsData", protectedObjectsData);
-
         return result;
     }
 
@@ -200,42 +207,47 @@ public class ProtectAreaJsonController {
         String[] cities = {};
         String[] counties = {};
 
-        // 区域
-        if("district".equals(regionType)){
-            provinces = new String[]{province};
-            cities = new String[]{city};
-            counties = new String[]{county};
-        }
-        // 专题
-        else if("topic".equals(regionType)){
-            List<String> provinceList = new ArrayList<>();
-            List<String> cityList = new ArrayList<>();
-            List<String> countyList = new ArrayList<>();
+        try {
+            // 区域
+            if("district".equals(regionType)){
+                provinces = new String[]{province};
+                cities = new String[]{city};
+                counties = new String[]{county};
+            }
+            // 专题
+            else if("topic".equals(regionType)){
+                List<String> provinceList = new ArrayList<>();
+                List<String> cityList = new ArrayList<>();
+                List<String> countyList = new ArrayList<>();
 
-            List<StatTopics> statTopics = statTopicsService.findAll(topic, subTopic);
-            for(int i=0; i<statTopics.size(); i++){
-                StatTopics item = statTopics.get(i);
-                if(!provinceList.contains(item.getProvince())){
-                    provinceList.add(item.getProvince());
+                List<StatTopics> statTopics = statTopicsService.findAll(topic, subTopic);
+                for(int i=0; i<statTopics.size(); i++){
+                    StatTopics item = statTopics.get(i);
+                    if(!provinceList.contains(item.getProvince())){
+                        provinceList.add(item.getProvince());
+                    }
+                    if(!countyList.contains(item.getCounty())){
+                        countyList.add(item.getCounty());
+                    }
                 }
-                if(!countyList.contains(item.getCounty())){
-                    countyList.add(item.getCounty());
-                }
+
+                provinces = provinceList.toArray(new String[0]);
+                cities = cityList.toArray(new String[0]);
+                counties = countyList.toArray(new String[0]);
             }
 
-            provinces = provinceList.toArray(new String[0]);
-            counties = countyList.toArray(new String[0]);
+            data = protectAreaService.findAllByDistrict(provinces, cities, counties, protectedObjects, startYear, endYear);
+//            count = protectAreaService.countByDistrict(provinces, cities, counties, protectedObjects, startYear, endYear);
         }
-
-        data = protectAreaService.findAllByDistrict(provinces, cities, counties, protectedObjects, startYear, endYear);
-        count = protectAreaService.countByDistrict(provinces, cities, counties, protectedObjects, startYear,endYear);
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
         LayuiTableDataVO result = new LayuiTableDataVO();
         result.setCode(0);
         result.setMsg("");
         result.setCount(count);
         result.setData(data);
-
         return result;
     }
 }
