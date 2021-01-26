@@ -93,11 +93,11 @@ public class StatTopicsServiceImpl implements StatTopicsService {
                 Path<String> subTopicsPath = root.get("subTopics");
 
                 List<Predicate> predicates = new ArrayList<Predicate>();
-                if(topic != null ) {
+                if(topic != null && !topic.isEmpty()) {
                     predicates.add(cb.like(topicsPath, "%" + topic + "%"));
                 }
 
-                if(subTopic != null ) {
+                if(subTopic != null && !subTopic.isEmpty()) {
                     predicates.add(cb.like(subTopicsPath, "%" + subTopic + "%"));
                 }
 
@@ -114,12 +114,15 @@ public class StatTopicsServiceImpl implements StatTopicsService {
     @Override
     public List<StatTopics> findAll(String topic, String subTopic) {
         Specification<StatTopics> spec = getSpec(topic, subTopic);
-        return statTopicsRepository.findAll(spec);
+        List<StatTopics> result = statTopicsRepository.findAll(spec);
+        return result;
+
     }
 
     @Override
     public long count(String topic, String subTopic){
         Specification<StatTopics> spec = getSpec(topic, subTopic);
-        return statTopicsRepository.count(spec);
+        long result = statTopicsRepository.count(spec);
+        return result;
     }
 }

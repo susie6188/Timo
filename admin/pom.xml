@@ -23,8 +23,9 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.75</version>
+            <version>1.2.58</version>
         </dependency>
+
         <!--开发模块，上线部署可以注释掉-->
         <dependency>
             <groupId>com.linln</groupId>
