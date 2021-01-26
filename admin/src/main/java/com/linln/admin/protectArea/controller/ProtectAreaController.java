@@ -12,6 +12,7 @@ import com.linln.component.fileUpload.FileUpload;
 import com.linln.devtools.generate.GenerateController;
 import com.linln.modules.protectArea.domain.Area;
 import com.linln.modules.protectArea.domain.ProtectArea;
+import com.linln.modules.protectArea.repository.ProtectAreaRepository;
 import com.linln.modules.protectArea.service.ProtectAreaService;
 import com.linln.modules.system.domain.Upload;
 import jdk.nashorn.internal.ir.ReturnNode;
@@ -44,6 +45,9 @@ public class ProtectAreaController {
 
     @Autowired
     private ProtectAreaService protectAreaService;
+
+    @Autowired
+    private ProtectAreaRepository protectAreaRepository;
     //private GenerateController uploadService;
 
     /**
@@ -152,7 +156,12 @@ public class ProtectAreaController {
         }
     }
 
-
+/**
+ * TODO
+ * 增加根据用户权限范围导出数据
+ * 增加根据查询条件导出查询结果数据
+ *
+ */
 
     /**
      * 导出excel
@@ -160,8 +169,8 @@ public class ProtectAreaController {
     @RequestMapping("/excel/export")
     @RequiresPermissions("protectArea:protectArea:add")
     @ResponseBody
-    public void exportExcel(){
-        ProtectArea protectArea = new ProtectArea();
+    public void exportExcel(ProtectArea protectArea){
+        //ProtectArea protectArea = new ProtectArea();
         // 创建匹配器，进行动态查询匹配
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher("name", match -> match.contains())
@@ -173,8 +182,10 @@ public class ProtectAreaController {
 
         // 获取数据列表
         Example<ProtectArea> example = Example.of(protectArea, matcher);
-        Page<ProtectArea> list = protectAreaService.getPageList(example);
-        List datalist = list.getContent();
+        //Page<ProtectArea> list = protectAreaService.getPageList(example);
+        //List datalist = list.getContent();
+
+        List<ProtectArea> datalist = protectAreaRepository.findAll(example);
         //List datalist = (List) protectAreaService.getById(Long.valueOf(1));
         //System.out.println(datalist);
         try {

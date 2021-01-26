@@ -60,7 +60,7 @@ public class ProtectArea implements Serializable {
     private Double initialArea;
     // 现状面积（平方公里）
     @Excel("现状面积（平方公里）")
-    private Double currentArea;
+    private Double currentArea=0.00;
     // 陆地面积（平方公里）
     @Excel("陆地面积（平方公里）")
     private Double landArea;
