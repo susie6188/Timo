@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.*;
 
 /**
@@ -69,14 +70,26 @@ public class StatTopics implements Serializable {
     // 数据状态
     private Byte status = StatusEnum.OK.getCode();
 
-    @Column
-    private String areacode;
 
-    public String getAreacode() {
-        return areacode;
+    @Column
+    private int locationCount = 0;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "statTopics")
+    private List<StatTopicsLocation> locations;
+
+    public List<StatTopicsLocation> getLocations() {
+        return locations;
     }
 
-    public void setAreacode(String areacode) {
-        this.areacode = areacode;
+    public void setLocations(List<StatTopicsLocation> locations) {
+        this.locations = locations;
+    }
+
+    public int getLocationCount() {
+        return locationCount;
+    }
+
+    public void setLocationCount(int locationCount) {
+        this.locationCount = locationCount;
     }
 }

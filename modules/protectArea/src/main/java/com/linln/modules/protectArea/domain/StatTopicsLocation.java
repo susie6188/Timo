@@ -3,8 +3,8 @@ package com.linln.modules.protectArea.domain;
 import javax.persistence.*;
 
 @Entity
-@Table(name="pa_location")
-public class ProjectAreaLocation {
+@Table(name="stat_location")
+public class StatTopicsLocation {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -14,7 +14,7 @@ public class ProjectAreaLocation {
     private String adcode;
 
     @ManyToOne
-    private ProtectArea protectArea;
+    private StatTopics statTopics;
 
     @Transient
     private String province;
@@ -65,11 +65,11 @@ public class ProjectAreaLocation {
         this.county = county;
     }
 
-    public ProtectArea getProtectArea() {
-        return protectArea;
+    public StatTopics getStatTopics() {
+        return statTopics;
     }
 
-    public void setProtectArea(ProtectArea protectArea) {
-        this.protectArea = protectArea;
+    public void setStatTopics(StatTopics statTopics) {
+        this.statTopics = statTopics;
     }
 }

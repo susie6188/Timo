@@ -34,19 +34,30 @@ layui.config({
 
     $("#query").click(function(){
         var regionType = $("#regionType").val();
-        // var province = $("#province").val();
-        // var city = $("#city").val();
-        // var county = $("#val").text();
+        var province = $("#province").val();
+        var city = $("#city").val();
+        var county = $("#val").text();
 
-        var province = $("#province").find("option:selected").text();
-        var city = $("#city").find("option:selected").text();
-        var county = $("#county").find("option:selected").text();
+        // var province = $("#province").find("option:selected").text();
+        // var city = $("#city").find("option:selected").text();
+        // var county = $("#county").find("option:selected").text();
 
         var topic = $("#topic").val();
         var subTopic = $("#subTopic").val();
         var protectedObjects =  $("#protectedObjects").val();
         var startYear = $("#startYear").val();
         var endYear = $("#endYear").val();
+
+        if("district" == regionType){
+            if(province == null || province.length == 0){
+                return;
+            }
+        }
+        else if("topic" == regionType){
+            if(topic == null || topic.length == 0){
+                return;
+            }
+        }
 
         $.ajax({
             type: "GET",
