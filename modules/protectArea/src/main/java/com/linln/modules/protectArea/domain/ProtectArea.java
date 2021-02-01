@@ -159,7 +159,10 @@ public class ProtectArea implements Serializable {
     // 数据状态
     private Byte status = StatusEnum.OK.getCode();
 
-    @OneToMany(fetch= LAZY)
+    @Column
+    private int locationCount = 0;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch= LAZY, mappedBy = "protectArea")
     private List<ProjectAreaLocation> locations;
 
     public List<ProjectAreaLocation> getLocations() {
@@ -168,5 +171,13 @@ public class ProtectArea implements Serializable {
 
     public void setLocations(List<ProjectAreaLocation> locations) {
         this.locations = locations;
+    }
+
+    public int getLocationCount() {
+        return locationCount;
+    }
+
+    public void setLocationCount(int locationCount) {
+        this.locationCount = locationCount;
     }
 }

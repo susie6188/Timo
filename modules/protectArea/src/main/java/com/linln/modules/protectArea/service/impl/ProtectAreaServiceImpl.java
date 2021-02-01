@@ -2,12 +2,14 @@ package com.linln.modules.protectArea.service.impl;
 
 import com.linln.common.data.PageSort;
 import com.linln.common.enums.StatusEnum;
+import com.linln.modules.protectArea.domain.IProtectAreaTO;
 import com.linln.modules.protectArea.domain.ProtectArea;
 import com.linln.modules.protectArea.repository.ProtectAreaRepository;
 import com.linln.modules.protectArea.service.ProtectAreaService;
 import com.linln.modules.system.domain.Dict;
 import com.linln.modules.system.service.DictService;
 import org.hibernate.query.criteria.internal.predicate.InPredicate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -97,50 +99,23 @@ public class ProtectAreaServiceImpl implements ProtectAreaService {
 
                 List<Predicate> predicates = new ArrayList<Predicate>();
 
-                Predicate provincePredicate = null;
-                if(provinces.length > 0) {
+                Predicate predicate = null;
+                if(provinces.length > 0 && cities.length >0 && counties.length > 0) {
                     for(int i=0; i<provinces.length; i++){
-                        // predicates.add(cb.like(provincePath, "%" + provinces[i] + "%"));
-                        if(provincePredicate == null){
-                            provincePredicate = cb.like(provincePath, "%" + provinces[i] + "%");
+                        Predicate predict = cb.like(provincePath, "%" + provinces[i] + "%");
+                        predict = cb.and(predict, cb.like(cityPath, "%" + cities[i] + "%"));
+                        predict = cb.and(predict, cb.like(countyPath, "%" + counties[i] + "%"));
+                        if(predicate == null){
+                            predicate = predict;
                         }
                         else{
-                            provincePredicate = cb.or(provincePredicate, cb.like(provincePath, "%" + provinces[i] + "%"));
-                        }
-                    }
-//                    predicates.add(provincePredicate);
-                }
-
-                Predicate cityPredicate = null;
-                if(cities.length > 0) {
-                    for(int i=0; i<cities.length; i++){
-//                        predicates.add(cb.like(cityPath, "%" + cities[i] + "%"));
-                        if(cityPredicate == null){
-                            cityPredicate = cb.or(cb.like(cityPath, "%" + cities[i] + "%"));
-                        }
-                        else{
-                            cityPredicate = cb.or(cityPredicate, cb.like(cityPath, "%" + cities[i] + "%"));
-                        }
-                    }
-//                    predicates.add(cityPredicate);
-                }
-
-                Predicate countyPredict = null;
-                if(counties.length > 0) {
-                    for(int i=0;i<counties.length;i++){
-                        if(countyPredict == null){
-//                            predicates.add(cb.like(countyPath, "%" + counties[i] + "%"));
-                            countyPredict = cb.like(countyPath, "%" + counties[i] + "%");
-                        }
-                        else{
-                            countyPredict = cb.or(countyPredict, cb.like(countyPath, "%" + counties[i] + "%"));
+                            predicate = cb.or(predicate, predict);
                         }
                     }
                 }
 
                 Predicate protectedObjectsPredicate = null;
                 if(protectedObjects != null && protectedObjects.length() > 0) {
-//                    predicates.add(cb.like(protectedObjectsPath, "%" + protectedObjects + "%"));
                     protectedObjectsPredicate = cb.like(protectedObjectsPath, "%" + protectedObjects + "%");
                 }
 
@@ -154,7 +129,6 @@ public class ProtectAreaServiceImpl implements ProtectAreaService {
                     calendar.set(Calendar.MINUTE, 0);
                     calendar.set(Calendar.SECOND, 0);
 
-//                    predicates.add(cb.greaterThan(replyTimePath, calendar.getTime()));
                     startYearPredicate = cb.greaterThan(replyTimePath, calendar.getTime());
                 }
 
@@ -168,23 +142,7 @@ public class ProtectAreaServiceImpl implements ProtectAreaService {
                     calendar.set(Calendar.MINUTE, 59);
                     calendar.set(Calendar.SECOND, 59);
 
-//                    predicates.add(cb.lessThan(replyTimePath, calendar.getTime()));
                     endYearPredicate = cb.lessThan(replyTimePath, calendar.getTime());
-                }
-
-//                Predicate[] array = new Predicate[predicates.size()];
-//                query.where(predicates.toArray(array));
-
-                Predicate predicate = cb.like(provincePath, "%");
-
-                if(provincePredicate != null){
-                    predicate = cb.and(predicate, provincePredicate);
-                }
-                if(cityPredicate != null){
-                    predicate = cb.and(predicate, cityPredicate);
-                }
-                if(countyPredict != null){
-                    predicate = cb.and(predicate, countyPredict);
                 }
                 if(protectedObjectsPredicate != null){
                     predicate = cb.and(predicate, protectedObjectsPredicate);
@@ -219,6 +177,20 @@ public class ProtectAreaServiceImpl implements ProtectAreaService {
     @Override
     public List getCategory() {
         return protectAreaRepository.getCategory();
+    }
+
+    @Override
+    public List<ProtectArea> findAllByAdcode(List<String> adcodes) {
+        String adcodesStr = String.join(",", adcodes);
+        List<IProtectAreaTO> objects = protectAreaRepository.findAllByAdcode(adcodes);
+
+        List<ProtectArea> result = new ArrayList<ProtectArea>();
+        for(int i=0;i<objects.size();i++){
+            ProtectArea protectArea = new ProtectArea();
+            BeanUtils.copyProperties(objects.get(i), protectArea);
+            result.add(protectArea);
+        }
+        return result;
     }
 
 }

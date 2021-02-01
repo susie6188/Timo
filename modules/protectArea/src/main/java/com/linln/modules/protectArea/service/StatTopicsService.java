@@ -47,4 +47,8 @@ public interface StatTopicsService {
 
     List<StatTopics> findAll(String topic, String subTopic);
     long count(String topic, String subTopic);
+
+    List<StatTopics> findAll();
+    long count();
+
 }

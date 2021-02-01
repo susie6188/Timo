@@ -19,4 +19,8 @@ public interface AdcodeService {
     public List<IAdcodeTO> findCounties(String cityCode);
 
     public void save(Adcode entity);
+
+    public List<Adcode> findAllByProvinceAndCityAndCounty(String province, String city, String county);
+
+    List<Adcode> findAllByProvinceAndCounty(String province, String county);
 }

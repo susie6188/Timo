@@ -125,4 +125,14 @@ public class StatTopicsServiceImpl implements StatTopicsService {
         long result = statTopicsRepository.count(spec);
         return result;
     }
+
+    @Override
+    public List<StatTopics> findAll() {
+        return statTopicsRepository.findAll();
+    }
+
+    @Override
+    public long count() {
+        return statTopicsRepository.count();
+    }
 }

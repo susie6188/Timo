@@ -22,4 +22,8 @@ public interface AdcodeRepository extends JpaRepository<Adcode, Long> {
 
     @Query(nativeQuery = true, value = "select county as name, county_code as code from adcode where city_code = :cityCode")
     List<IAdcodeTO> findCounties(@Param("cityCode") String cityCode);
+
+    List<Adcode> findAllByProvinceAndCityAndCounty(String province, String city, String county);
+
+    List<Adcode> findAllByProvinceAndCounty(String province, String county);
 }

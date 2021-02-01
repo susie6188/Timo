@@ -18,6 +18,16 @@ public class AdcodeServiceImpl implements AdcodeService {
     private AdcodeRepository repository;
 
     @Override
+    public List<Adcode> findAllByProvinceAndCityAndCounty(String province, String city, String county){
+        return repository.findAllByProvinceAndCityAndCounty(province, city, county);
+    }
+
+    @Override
+    public List<Adcode> findAllByProvinceAndCounty(String province, String county) {
+        return repository.findAllByProvinceAndCounty(province, county);
+    }
+
+    @Override
     public Optional<Adcode> findById(long id) {
         return repository.findById(id);
     }

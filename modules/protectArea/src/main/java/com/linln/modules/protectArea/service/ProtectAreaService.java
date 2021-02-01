@@ -57,4 +57,6 @@ public interface ProtectAreaService {
 
     List<ProtectArea> findAllByDistrict(String[] provinces, String[] cities, String[] counties, String protectedObjects, int startYear, int endYear);
     long countByDistrict(String[] provinces, String[] cities, String[] counties, String protectedObjects, int startYear, int endYear);
+
+    List<ProtectArea> findAllByAdcode(List<String> adcodes);
 }

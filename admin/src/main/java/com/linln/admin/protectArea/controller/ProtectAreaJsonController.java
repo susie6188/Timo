@@ -1,14 +1,20 @@
 package com.linln.admin.protectArea.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.linln.modules.protectArea.domain.*;
 import com.linln.modules.protectArea.domain.LayuiTableDataVO;
 import com.linln.modules.protectArea.domain.ProtectArea;
 import com.linln.modules.protectArea.domain.StatTopics;
 import com.linln.modules.protectArea.repository.ProtectAreaRepository;
+import com.linln.modules.protectArea.service.AdcodeService;
 import com.linln.modules.protectArea.service.ProtectAreaService;
+import com.linln.modules.protectArea.service.impl.AdcodeServiceImpl;
 import com.linln.modules.protectArea.service.impl.StatTopicsServiceImpl;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.mysql.cj.xdevapi.JsonArray;
+import net.sf.ehcache.util.LargeSet;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 import com.alibaba.fastjson.JSON;
@@ -32,6 +38,9 @@ import java.util.*;
 @RestController
 @RequestMapping("protectArea/json")
 public class ProtectAreaJsonController {
+
+    @Autowired
+    private AdcodeServiceImpl adcodeService;
 
     @Autowired
     private ProtectAreaService protectAreaService;
@@ -132,6 +141,55 @@ public class ProtectAreaJsonController {
         return datalist;
     }
 
+    private List<String> queryDistrictAdcode(String provinceCode, String cityCode, String countyCode){
+        List<String> adcodeList = new ArrayList<>();
+        Set<String> adcodeSet = new HashSet<>();
+        if(countyCode.isEmpty()){
+            if(cityCode.isEmpty()){
+                List<IAdcodeTO> cityAdcodes = adcodeService.findCites(provinceCode);
+                for(int i=0; i<cityAdcodes.size(); i++){
+                    List<IAdcodeTO> countyAdcodes = adcodeService.findCounties(cityAdcodes.get(i).getCode());
+                    for(int j=0;j<countyAdcodes.size();j++){
+                        adcodeSet.add(countyAdcodes.get(j).getCode());
+                    }
+                }
+            }
+            else{
+                List<IAdcodeTO> countyAdcodes = adcodeService.findCounties(cityCode);
+                for(int i=0; i<countyAdcodes.size(); i++){
+                    adcodeSet.add(countyAdcodes.get(i).getCode());
+                }
+            }
+        }
+        else{
+            adcodeSet.add(countyCode);
+        }
+
+        adcodeList.addAll(adcodeSet);
+        return adcodeList;
+    }
+
+    private List<String> queryStatTopicsAdcode(String topic, String subTopic){
+        List<String> adcodeList = new ArrayList<>();
+        Set<String> adcodeSet = new HashSet<String>();
+
+        List<StatTopics> statTopics = statTopicsService.findAll(topic, subTopic);
+        for(int i=0; i<statTopics.size(); i++){
+            StatTopics item = statTopics.get(i);
+            List<StatTopicsLocation> locations = item.getLocations();
+            for(int j=0;j<locations.size();j++){
+                adcodeSet.add(locations.get(j).getAdcode());
+            }
+        }
+
+        adcodeList.addAll(adcodeSet);
+        return adcodeList;
+    }
+
+    private List<ProtectArea> queryProtectArea(List<String> adcodes){
+        return protectAreaService.findAllByAdcode(adcodes);
+    }
+
     @ResponseBody
     @RequestMapping(value = "/query4Chart", produces = "application/json;charset=UTF-8")
     public JSONObject query4Chart(
@@ -147,39 +205,18 @@ public class ProtectAreaJsonController {
     ){
         List<ProtectArea> data = null;
         long count = 0;
-        String[] provinces = {};
-        String[] cities = {};
-        String[] counties = {};
+        List<String> countyCodes = null;
 
         // 区域
         if("district".equals(regionType)){
-            provinces = new String[]{province};
-            cities = new String[]{city};
-            counties = new String[]{county};
+            countyCodes = queryDistrictAdcode(province, city, county);
         }
         // 专题
         else if("topic".equals(regionType)){
-            List<String> provinceList = new ArrayList<>();
-            List<String> cityList = new ArrayList<>();
-            List<String> countyList = new ArrayList<>();
-
-            List<StatTopics> statTopics = statTopicsService.findAll(topic, subTopic);
-            for(int i=0; i<statTopics.size(); i++){
-                StatTopics item = statTopics.get(i);
-                if(!provinceList.contains(item.getProvince())){
-                    provinceList.add(item.getProvince());
-                }
-                if(!countyList.contains(item.getCounty())){
-                    countyList.add(item.getCounty());
-                }
-            }
-
-            provinces = provinceList.toArray(new String[0]);
-            cities = cityList.toArray(new String[0]);
-            counties = countyList.toArray(new String[0]);
+            countyCodes = queryStatTopicsAdcode(topic, subTopic);
         }
-        data = protectAreaService.findAllByDistrict(provinces, cities, counties, protectedObjects, startYear, endYear);
-//        count = protectAreaService.countByDistrict(provinces, cities, counties, protectedObjects, startYear,endYear);
+
+        data = queryProtectArea(countyCodes);
 
         JSONArray provinceData = new JSONArray();
         List<String> provinceList = new ArrayList<>();
@@ -253,41 +290,18 @@ public class ProtectAreaJsonController {
     ){
         List<ProtectArea> data = null;
         long count = 0;
-        String[] provinces = {};
-        String[] cities = {};
-        String[] counties = {};
+        List<String> countyCodes = null;
 
         try {
             // 区域
             if("district".equals(regionType)){
-                provinces = new String[]{province};
-                cities = new String[]{city};
-                counties = new String[]{county};
+                countyCodes = queryDistrictAdcode(province, city, county);
             }
             // 专题
             else if("topic".equals(regionType)){
-                List<String> provinceList = new ArrayList<>();
-                List<String> cityList = new ArrayList<>();
-                List<String> countyList = new ArrayList<>();
-
-                List<StatTopics> statTopics = statTopicsService.findAll(topic, subTopic);
-                for(int i=0; i<statTopics.size(); i++){
-                    StatTopics item = statTopics.get(i);
-                    if(!provinceList.contains(item.getProvince())){
-                        provinceList.add(item.getProvince());
-                    }
-                    if(!countyList.contains(item.getCounty())){
-                        countyList.add(item.getCounty());
-                    }
-                }
-
-                provinces = provinceList.toArray(new String[0]);
-                cities = cityList.toArray(new String[0]);
-                counties = countyList.toArray(new String[0]);
+                countyCodes = queryStatTopicsAdcode(topic, subTopic);
             }
-
-            data = protectAreaService.findAllByDistrict(provinces, cities, counties, protectedObjects, startYear, endYear);
-//            count = protectAreaService.countByDistrict(provinces, cities, counties, protectedObjects, startYear, endYear);
+            data = queryProtectArea(countyCodes);
         }
         catch (Exception e){
             e.printStackTrace();
