@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,8 +50,6 @@ public interface ProtectAreaService {
 
     List<ProtectArea> findAll();
 
-    List<ProtectArea> findAllByDistrict(String[] provinces, String[] cities, String[] counties, String protectedObjects, int startYear, int endYear);
-    long countByDistrict(String[] provinces, String[] cities, String[] counties, String protectedObjects, int startYear, int endYear);
-
-    List<ProtectArea> findAllByAdcode(List<String> adcodes);
+    List<ProtectArea> findAll(List<String> adcodes, String protectedObjects, Date startDate, Date endDate);
+    List<ProtectArea> findAll(String protectedObjects, Date startDate, Date endDate);
 }

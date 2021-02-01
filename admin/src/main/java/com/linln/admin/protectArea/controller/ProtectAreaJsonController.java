@@ -86,25 +86,28 @@ public class ProtectAreaJsonController {
     private List<String> queryDistrictAdcode(String provinceCode, String cityCode, String countyCode){
         List<String> adcodeList = new ArrayList<>();
         Set<String> adcodeSet = new HashSet<>();
-        if(countyCode.isEmpty()){
-            if(cityCode.isEmpty()){
-                List<IAdcodeTO> cityAdcodes = adcodeService.findCites(provinceCode);
-                for(int i=0; i<cityAdcodes.size(); i++){
-                    List<IAdcodeTO> countyAdcodes = adcodeService.findCounties(cityAdcodes.get(i).getCode());
-                    for(int j=0;j<countyAdcodes.size();j++){
-                        adcodeSet.add(countyAdcodes.get(j).getCode());
-                    }
-                }
-            }
-            else{
+        if(!countyCode.isEmpty()){
+            adcodeSet.add(countyCode);
+        }
+        else{
+            if(!countyCode.isEmpty()){
                 List<IAdcodeTO> countyAdcodes = adcodeService.findCounties(cityCode);
                 for(int i=0; i<countyAdcodes.size(); i++){
                     adcodeSet.add(countyAdcodes.get(i).getCode());
                 }
             }
-        }
-        else{
-            adcodeSet.add(countyCode);
+            else{
+                if(!provinceCode.isEmpty()){
+                    List<IAdcodeTO> cityAdcodes = adcodeService.findCites(provinceCode);
+                    for(int i=0; i<cityAdcodes.size(); i++){
+                        List<IAdcodeTO> countyAdcodes = adcodeService.findCounties(cityAdcodes.get(i).getCode());
+                        for(int j=0;j<countyAdcodes.size();j++){
+                            adcodeSet.add(countyAdcodes.get(j).getCode());
+                        }
+                    }
+                }
+
+            }
         }
 
         adcodeList.addAll(adcodeSet);
@@ -128,8 +131,45 @@ public class ProtectAreaJsonController {
         return adcodeList;
     }
 
-    private List<ProtectArea> queryProtectArea(List<String> adcodes){
-        return protectAreaService.findAllByAdcode(adcodes);
+    private List<ProtectArea> queryProtectArea(List<String> adcodes, String protectedObjects, Date startDate, Date endDate){
+        if(adcodes.size() > 0){
+            return protectAreaService.findAll(adcodes, protectedObjects, startDate, endDate);
+        }
+        else{
+            return protectAreaService.findAll(protectedObjects, startDate, endDate);
+        }
+    }
+
+    private Date setStartDate(int startYear){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MONTH, 1);
+        calendar.set(Calendar.DATE, 1);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        if(startYear != -1){
+            calendar.set(Calendar.YEAR, startYear);
+        }
+        else{
+            calendar.set(Calendar.YEAR, 1900);
+        }
+        return calendar.getTime();
+    }
+
+    private Date setEndDate(int endYear){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MONTH, 12);
+        calendar.set(Calendar.DATE, 31);
+        calendar.set(Calendar.HOUR, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        if(endYear != -1){
+            calendar.set(Calendar.YEAR, endYear);
+        }
+        else{
+            calendar.set(Calendar.YEAR, 2999);
+        }
+        return calendar.getTime();
     }
 
     @ResponseBody
@@ -141,9 +181,9 @@ public class ProtectAreaJsonController {
             @RequestParam(defaultValue = "") String county,
             @RequestParam(defaultValue = "") String topic,
             @RequestParam(defaultValue = "") String subTopic,
-            @RequestParam String protectedObjects,
-            @RequestParam int startYear,
-            @RequestParam int endYear
+            @RequestParam(defaultValue = "") String protectedObjects,
+            @RequestParam(defaultValue = "-1") int startYear,
+            @RequestParam(defaultValue = "-1") int endYear
     ){
         List<ProtectArea> data = null;
         long count = 0;
@@ -158,7 +198,10 @@ public class ProtectAreaJsonController {
             countyCodes = queryStatTopicsAdcode(topic, subTopic);
         }
 
-        data = queryProtectArea(countyCodes);
+        protectedObjects = "%" + protectedObjects + "%";
+        Date startDate = setStartDate(startYear);
+        Date endDate = setEndDate(endYear);
+        data = queryProtectArea(countyCodes, protectedObjects, startDate, endDate);
 
         JSONArray provinceData = new JSONArray();
         List<String> provinceList = new ArrayList<>();
@@ -243,7 +286,11 @@ public class ProtectAreaJsonController {
             else if("topic".equals(regionType)){
                 countyCodes = queryStatTopicsAdcode(topic, subTopic);
             }
-            data = queryProtectArea(countyCodes);
+
+            protectedObjects = "%" + protectedObjects + "%";
+            Date startDate = setStartDate(startYear);
+            Date endDate = setEndDate(endYear);
+            data = queryProtectArea(countyCodes, protectedObjects, startDate, endDate);
         }
         catch (Exception e){
             e.printStackTrace();

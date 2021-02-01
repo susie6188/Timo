@@ -36,21 +36,35 @@ layui.config({
         var regionType = $("#regionType").val();
         var province = $("#province").val();
         var city = $("#city").val();
-        var county = $("#val").text();
-
-        // var province = $("#province").find("option:selected").text();
-        // var city = $("#city").find("option:selected").text();
-        // var county = $("#county").find("option:selected").text();
+        var county = $("#county").val();
 
         var topic = $("#topic").val();
         var subTopic = $("#subTopic").val();
         var protectedObjects =  $("#protectedObjects").val();
         var startYear = $("#startYear").val();
         var endYear = $("#endYear").val();
+        var titleRegion = "";
+        var titleYear = "";
+
+        if(endYear > startYear){
+            return;
+        }
+        else{
+            if(endYear == startYear){
+                titleYear = startYear + "年";
+            }
+            else{
+                titleYear = startYear + "-" + endYear + "年";
+            }
+        }
 
         if("district" == regionType){
             if(province == null || province.length == 0){
-                return;
+                titleRegion = "全国";
+                // return;
+            }
+            else{
+                titleRegion = province + city + county;
             }
         }
         else if("topic" == regionType){
@@ -86,10 +100,24 @@ layui.config({
                 }
 
                 var provinceChartOption = {
+                    title: {
+                        text: titleYear + titleRegion + '自然保护地',
+                        subtext: '按行政区统计',
+                    },
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: {
-                            type: 'cross'
+                            type: 'shadow'
+                        },
+                        formatter:function(params){
+                            var res = params[0].name;
+                            res += "<br>"+params[0].marker+params[0].seriesName+"："+ params[0].data;
+                            res += "<br>"+params[1].marker+params[1].seriesName+"："+ params[1].data.toFixed(2);
+
+                            // for (var i = 0; i < params.length; i++) {
+                            //     res += "<br>"+params[i].marker+params[i].seriesName+"："+ params[i].data.toFixed(2);
+                            // }
+                            return res;
                         }
                     },
                     legend: {
@@ -159,10 +187,24 @@ layui.config({
                 }
 
                 var protectedObjectsChartOption = {
+                    title: {
+                        text: titleYear + titleRegion + '自然保护地',
+                        subtext: '按保护对象统计',
+                    },
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: {
-                            type: 'cross'
+                            type: 'shadow'
+                        },
+                        formatter:function(params){
+                            var res = params[0].name;
+                            res += "<br>"+params[0].marker+params[0].seriesName+"："+ params[0].data;
+                            res += "<br>"+params[1].marker+params[1].seriesName+"："+ params[1].data.toFixed(2);
+
+                            // for (var i = 0; i < params.length; i++) {
+                            //     res += "<br>"+params[i].marker+params[i].seriesName+"："+ params[i].data.toFixed(2);
+                            // }
+                            return res;
                         }
                     },
                     legend: {
