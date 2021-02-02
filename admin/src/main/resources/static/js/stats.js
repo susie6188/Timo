@@ -6,15 +6,17 @@ layui.config({
         ,echarts = layui.echarts
         ,table = layui.table;
     var colors = ['#5470C6', '#91CC75', '#EE6666'];
+
     var provinceChart = echarts.init(document.getElementById('provinceChart'));
     var protectedObjectsChart = echarts.init(document.getElementById('protectedObjectsChart'));
+
     var districtStatTable = layui.table;
     var protectedObjectsStatTable = layui.table;
     var detailTable = layui.table;
 
     var detailTableOption = {
         elem: '#detailTable'
-        ,url: ''
+        ,page: false
         ,totalRow: true
         ,toolbar: true
         ,cols: [[
@@ -28,14 +30,15 @@ layui.config({
             ,{field: 'protectedObjects', title: '主要保护对象'}
             ,{field: 'currentArea', title: '现状面积(平方公里)', totalRow: true, templet: function(d){
                     return Number(d.currentArea).toFixed(2);
-                }}
+                }
+            }
         ]]
     };
 
     var districtStatTableOption = {
         elem: '#districtStatTable'
-        ,title: '行政区'
-        ,height: 300
+        ,height: 400
+        ,page: false
         ,totalRow: true
         ,toolbar: true
         ,cols: [[
@@ -50,7 +53,8 @@ layui.config({
 
     var protectedObjectsStatTableOption = {
         elem: '#protectedObjectsStatTable'
-        ,height: 300
+        ,height: 400
+        ,page: false
         ,totalRow: true
         ,toolbar: true
         ,cols: [[
@@ -250,7 +254,6 @@ layui.config({
                     districtStatTable.render(districtStatTableOption);
                 }
 
-
                 // 按保护对象统计
                 var protectedObjectsData = data.protectedObjectsData;
                 var protectedObjectsXData = new Array();
@@ -345,6 +348,7 @@ layui.config({
 
                     $("#protectedObjectsStatTable").text(protectedObjectsStatTitle);
                     protectedObjectsStatTableOption.data = protectedObjectsStatTableData;
+                    protectedObjectsStatTableOption.limit = protectedObjectsStatTableData.length;
                     protectedObjectsStatTable.render(protectedObjectsStatTableOption);
                 }
             }
@@ -363,6 +367,7 @@ layui.config({
             "&protectedObjects=" + protectedObjects +
             "&startYear=" + startYear +
             "&endYear=" + endYear;
+        detailTableOption.limit = 100000;
         detailTable.render(detailTableOption);
     });
 

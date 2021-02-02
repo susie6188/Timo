@@ -208,6 +208,7 @@ public class ProtectAreaJsonController {
             Date startDate = setStartDate(startYear);
             Date endDate = setEndDate(endYear);
             data = queryProtectArea(countyCodes, protectedObjects, startDate, endDate, page, limit);
+            count = data.size();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -220,7 +221,6 @@ public class ProtectAreaJsonController {
         result.setData(data);
         return result;
     }
-
 
     private List<String> queryDistrictAdcode(String provinceCode, String cityCode, String countyCode){
         List<String> adcodeList = new ArrayList<>();

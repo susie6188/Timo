@@ -140,8 +140,8 @@
     </div>
 
     <div class="layui-card">
-        <div class="layui-card-header"></div>
-        <div class="layui-card-body layui-row">
+        <div class="layui-card-header">统计图</div>
+        <div class="layui-card-body layui-row"></div>
             <div id="provinceChart" class="layui-col-md12" style="height: 600px;"></div>
         </div>
         <div class="layui-card-body layui-row">
@@ -150,15 +150,15 @@
         <div class="layui-card-body layui-row">
             <div class="layui-col-md6">
                 <label id="districtStatTableTitle"></label>
-                <table id="districtStatTable" class="layui-table timo-table">
-                </table>
+                <div class="timo-table-wrap">
+                    <table id="districtStatTable"class="layui-table timo-table"></table>
+                </div>
             </div>
             <div class="layui-col-md6">
                 <label id="protectedObjectsStatTableTitle"></label>
                 <div class="timo-table-wrap">
-                    <table id="protectedObjectsStatTable" class="layui-table timo-table">
-                </table>
-                </table>
+                    <table id="protectedObjectsStatTable" class="layui-table timo-table"></table>
+                </div>
             </div>
         </div>
     </div>
