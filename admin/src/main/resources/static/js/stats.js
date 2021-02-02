@@ -97,6 +97,10 @@ layui.config({
         var city = $("#city").val();
         var county = $("#county").val();
 
+        var provinceText = $("#province").find("option:selected").text();
+        var cityText = $("#city").find("option:selected").text();
+        var countyText = $("#county").find("option:selected").text();
+
         var topic = $("#topic").val();
         var subTopic = $("#subTopic").val();
         var protectedObjects =  $("#protectedObjects").val();
@@ -131,13 +135,15 @@ layui.config({
                 titleRegion = "全国";
             }
             else{
-                titleRegion = province + city + county;
+                titleRegion = provinceText + cityText + countyText;
             }
         }
         else if("topic" == regionType){
             if(topic == null || topic.length == 0){
                 return;
             }
+
+            titleRegion = topic + subTopic;
         }
 
         // 请求图数据
@@ -175,7 +181,7 @@ layui.config({
 
                     var provinceChartOption = {
                         title: {
-                            text: districtStatTitle,
+                            text: districtStatTitle
                         },
                         tooltip: {
                             trigger: 'axis',
@@ -186,10 +192,7 @@ layui.config({
                                 var res = params[0].name;
                                 res += "<br>"+params[0].marker+params[0].seriesName+"："+ params[0].data;
                                 res += "<br>"+params[1].marker+params[1].seriesName+"："+ params[1].data.toFixed(2);
-
-                                // for (var i = 0; i < params.length; i++) {
-                                //     res += "<br>"+params[i].marker+params[i].seriesName+"："+ params[i].data.toFixed(2);
-                                // }
+                                console.log(res);
                                 return res;
                             }
                         },
@@ -284,10 +287,6 @@ layui.config({
                                 var res = params[0].name;
                                 res += "<br>"+params[0].marker+params[0].seriesName+"："+ params[0].data;
                                 res += "<br>"+params[1].marker+params[1].seriesName+"："+ params[1].data.toFixed(2);
-
-                                // for (var i = 0; i < params.length; i++) {
-                                //     res += "<br>"+params[i].marker+params[i].seriesName+"："+ params[i].data.toFixed(2);
-                                // }
                                 return res;
                             }
                         },
@@ -432,13 +431,13 @@ layui.config({
                 for(var i=0; i<data.length; i++){
                     $("#subTopic").append("<option value='" + data[i].name + "'>" + data[i].name + "</option>");
                 }
-                // $("#subTopic").get(0).selectedIndex = -1;
             }
         });
     });
 
     loadProvinces();
     loadTopics();
+
 })
 
 function loadProvinces(){
@@ -467,7 +466,7 @@ function loadTopics(){
             for(var i=0; i<data.length; i++){
                 $("#topic").append("<option value='" + data[i].name + "'>" + data[i].name + "</option>");
             }
-            // $("#topic").get(0).selectedIndex = -1;
+            $("#topic").trigger('change');
         }
     });
 }
