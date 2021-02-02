@@ -82,107 +82,10 @@ public class ProtectAreaServiceImpl implements ProtectAreaService {
         return protectAreaRepository.findAll();
     }
 
-    // 根据单一行政区查询
-    private Specification<ProtectArea> getSpecByDistrict(String[] provinces, String[] cities, String[] counties, String protectedObjects, int startYear, int endYear){
-        Specification<ProtectArea> spec = new Specification<ProtectArea>(){
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public Predicate toPredicate(Root<ProtectArea> root,
-                                         CriteriaQuery<?> query,
-                                         CriteriaBuilder cb){
-                Path<String> provincePath = root.get("province");
-                Path<String> cityPath = root.get("city");
-                Path<String> countyPath = root.get("county");
-                Path<String> protectedObjectsPath = root.get("protectedObjects");
-                Path<Date> replyTimePath = root.get("replyTime");
-
-                List<Predicate> predicates = new ArrayList<Predicate>();
-
-                Predicate predicate = null;
-                if(provinces.length > 0 && cities.length >0 && counties.length > 0) {
-                    for(int i=0; i<provinces.length; i++){
-                        Predicate predict = cb.like(provincePath, "%" + provinces[i] + "%");
-                        predict = cb.and(predict, cb.like(cityPath, "%" + cities[i] + "%"));
-                        predict = cb.and(predict, cb.like(countyPath, "%" + counties[i] + "%"));
-                        if(predicate == null){
-                            predicate = predict;
-                        }
-                        else{
-                            predicate = cb.or(predicate, predict);
-                        }
-                    }
-                }
-
-                Predicate protectedObjectsPredicate = null;
-                if(protectedObjects != null && protectedObjects.length() > 0) {
-                    protectedObjectsPredicate = cb.like(protectedObjectsPath, "%" + protectedObjects + "%");
-                }
-
-                Predicate startYearPredicate = null;
-                if(startYear > 0) {
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(Calendar.YEAR, startYear);
-                    calendar.set(Calendar.MONTH, 1);
-                    calendar.set(Calendar.DATE, 1);
-                    calendar.set(Calendar.HOUR, 0);
-                    calendar.set(Calendar.MINUTE, 0);
-                    calendar.set(Calendar.SECOND, 0);
-
-                    startYearPredicate = cb.greaterThan(replyTimePath, calendar.getTime());
-                }
-
-                Predicate endYearPredicate = null;
-                if(endYear > 0) {
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(Calendar.YEAR, endYear);
-                    calendar.set(Calendar.MONTH, 12);
-                    calendar.set(Calendar.DATE, 31);
-                    calendar.set(Calendar.HOUR, 23);
-                    calendar.set(Calendar.MINUTE, 59);
-                    calendar.set(Calendar.SECOND, 59);
-
-                    endYearPredicate = cb.lessThan(replyTimePath, calendar.getTime());
-                }
-                if(protectedObjectsPredicate != null){
-                    predicate = cb.and(predicate, protectedObjectsPredicate);
-                }
-                if(startYearPredicate != null){
-                    predicate = cb.and(predicate, startYearPredicate);
-                }
-                if(endYearPredicate != null){
-                    predicate = cb.and(predicate, endYearPredicate);
-                }
-
-                query.where(predicate);
-                return null;
-            }
-        };
-
-        return spec;
-    }
-
     @Override
-    public List<ProtectArea> findAllByDistrict(String[] provinces, String[] cities, String[] counties, String protectedObjects, int startYear, int endYear) {
-        Specification<ProtectArea> spec = getSpecByDistrict(provinces, cities, counties, protectedObjects, startYear, endYear);
-        return protectAreaRepository.findAll(spec);
-    }
-
-    @Override
-    public long countByDistrict(String provinces[], String[] cities, String[] counties, String protectedObjects, int startYear, int endYear){
-        Specification<ProtectArea> spec = getSpecByDistrict(provinces, cities, counties, protectedObjects, startYear, endYear);
-        return protectAreaRepository.count(spec);
-    }
-
-    @Override
-    public List getCategory() {
-        return protectAreaRepository.getCategory();
-    }
-
-    @Override
-    public List<ProtectArea> findAllByAdcode(List<String> adcodes) {
+    public List<ProtectArea> findAll(List<String> adcodes, String protectedObjects, Date startDate, Date endDate, int offset, int limit) {
         String adcodesStr = String.join(",", adcodes);
-        List<IProtectAreaTO> objects = protectAreaRepository.findAllByAdcode(adcodes);
+        List<IProtectAreaTO> objects = protectAreaRepository.findAll(adcodes, protectedObjects, startDate, endDate, offset, limit);
 
         List<ProtectArea> result = new ArrayList<ProtectArea>();
         for(int i=0;i<objects.size();i++){
@@ -191,6 +94,25 @@ public class ProtectAreaServiceImpl implements ProtectAreaService {
             result.add(protectArea);
         }
         return result;
+    }
+
+    @Override
+    public List<ProtectArea> findAll(String protectedObjects, Date startDate, Date endDate, int offset, int limit) {
+        List<IProtectAreaTO> objects = protectAreaRepository.findAll(protectedObjects, startDate, endDate, offset, limit);
+
+        List<ProtectArea> result = new ArrayList<ProtectArea>();
+        for(int i=0;i<objects.size();i++){
+            ProtectArea protectArea = new ProtectArea();
+            BeanUtils.copyProperties(objects.get(i), protectArea);
+            result.add(protectArea);
+        }
+        return result;
+    }
+
+
+    @Override
+    public List getCategory() {
+        return protectAreaRepository.getCategory();
     }
 
 }
