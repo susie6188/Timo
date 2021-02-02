@@ -50,6 +50,6 @@ public interface ProtectAreaService {
 
     List<ProtectArea> findAll();
 
-    List<ProtectArea> findAll(List<String> adcodes, String protectedObjects, Date startDate, Date endDate);
-    List<ProtectArea> findAll(String protectedObjects, Date startDate, Date endDate);
+    List<ProtectArea> findAll(List<String> adcodes, String protectedObjects, Date startDate, Date endDate, int offset, int limit);
+    List<ProtectArea> findAll(String protectedObjects, Date startDate, Date endDate, int offset, int limit);
 }

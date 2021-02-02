@@ -79,11 +79,16 @@ public interface ProtectAreaRepository extends BaseRepository<ProtectArea, Long>
             "t1.id = t2.protect_area_id and " +
             "t1.protected_objects like :protectedObjects and " +
             "((t1.reply_time >= :startDate and t1.reply_time <= :endDate) or (t1.reply_time is null)) and " +
-            "t2.adcode in (:adcodes)")
+            "t2.adcode in (:adcodes) " +
+            "limit :limit " +
+            "offset :offset")
+
     List<IProtectAreaTO> findAll(@Param(value = "adcodes")List<String> adcodes,
                                  @Param(value = "protectedObjects")String protectedObjects,
                                  @Param(value = "startDate") Date startDate,
-                                 @Param(value = "endDate") Date endDate);
+                                 @Param(value = "endDate") Date endDate,
+                                 @Param(value = "offset") int offset,
+                                 @Param(value = "limit") int limit);
 
     @Query(nativeQuery = true, value = "SELECT " +
             "t1.id, " +
@@ -127,8 +132,12 @@ public interface ProtectAreaRepository extends BaseRepository<ProtectArea, Long>
             "FROM pa_protect_area t1, pa_location t2 where " +
             "t1.id = t2.protect_area_id and " +
             "t1.protected_objects like :protectedObjects% and " +
-            "((t1.reply_time >= :startDate and t1.reply_time <= :endDate) or (t1.reply_time is null))")
+            "((t1.reply_time >= :startDate and t1.reply_time <= :endDate) or (t1.reply_time is null)) " +
+            "limit :limit " +
+            "offset :offset")
     List<IProtectAreaTO> findAll(@Param(value = "protectedObjects")String protectedObjects,
                                  @Param(value = "startDate") Date startDate,
-                                 @Param(value = "endDate") Date endDate);
+                                 @Param(value = "endDate") Date endDate,
+                                 @Param(value = "offset") int offset,
+                                 @Param(value = "limit") int limit);
 }

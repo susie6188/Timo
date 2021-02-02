@@ -140,37 +140,36 @@
     </div>
 
     <div class="layui-card">
-        <div class="layui-card-header">统计图</div>
+        <div class="layui-card-header"></div>
         <div class="layui-card-body layui-row">
-            <div id="provinceChart" class="layui-col-md6" style="height: 500px;"></div>
-            <div id="protectedObjectsChart" class="layui-col-md6" style="height: 500px;"></div>
+            <div id="provinceChart" class="layui-col-md12" style="height: 600px;"></div>
+        </div>
+        <div class="layui-card-body layui-row">
+            <div id="protectedObjectsChart" class="layui-col-md12" style="height: 600px;"></div>
+        </div>
+        <div class="layui-card-body layui-row">
+            <div class="layui-col-md6">
+                <label id="districtStatTableTitle"></label>
+                <table id="districtStatTable" class="layui-table timo-table">
+                </table>
+            </div>
+            <div class="layui-col-md6">
+                <label id="protectedObjectsStatTableTitle"></label>
+                <div class="timo-table-wrap">
+                    <table id="protectedObjectsStatTable" class="layui-table timo-table">
+                </table>
+                </table>
+            </div>
         </div>
     </div>
 
     <div class="layui-card">
-        <div class="layui-card-header">数据表</div>
+        <div class="layui-card-header">
+            <label id="detailTableTitle"></label>
+        </div>
         <div class="layui-card-body">
             <div class="timo-table-wrap">
-                <table id="table" class="layui-table timo-table">
-<!--                    <thead>-->
-<!--                    <tr>-->
-<!--                        <th>名称</th>-->
-<!--                        <th>级别</th>-->
-<!--                        <th>类型</th>-->
-<!--                        <th>现状面积（平方公里）</th>-->
-<!--                        <th>所在省</th>-->
-<!--                        <th>所在市</th>-->
-<!--                        <th>所在县</th>-->
-<!--                        <th>主要保护对象</th>-->
-<!--                        <th>总规批复时间</th>-->
-<!--                        <th>功能分区</th>-->
-<!--                        <th>整合优化前保护地名称</th>-->
-<!--                    </tr>-->
-<!--                    </thead>-->
-<!--                    <tbody>-->
-
-<!--                    </tbody>-->
-                </table>
+                <table id="detailTable" class="layui-table timo-table"></table>
             </div>
         </div>
     </div>

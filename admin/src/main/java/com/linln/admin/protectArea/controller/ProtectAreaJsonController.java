@@ -83,6 +83,145 @@ public class ProtectAreaJsonController {
         return map;
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/query4Chart", produces = "application/json;charset=UTF-8")
+    public JSONObject query4Chart(
+            @RequestParam String regionType,
+            @RequestParam(defaultValue = "") String province,
+            @RequestParam(defaultValue = "") String city,
+            @RequestParam(defaultValue = "") String county,
+            @RequestParam(defaultValue = "") String topic,
+            @RequestParam(defaultValue = "") String subTopic,
+            @RequestParam(defaultValue = "") String protectedObjects,
+            @RequestParam(defaultValue = "-1") int startYear,
+            @RequestParam(defaultValue = "-1") int endYear,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int limit
+    ){
+        List<ProtectArea> data = null;
+        long count = 0;
+        List<String> countyCodes = null;
+
+        // 区域
+        if("district".equals(regionType)){
+            countyCodes = queryDistrictAdcode(province, city, county);
+        }
+        // 专题
+        else if("topic".equals(regionType)){
+            countyCodes = queryStatTopicsAdcode(topic, subTopic);
+        }
+
+        protectedObjects = "%" + protectedObjects + "%";
+        Date startDate = setStartDate(startYear);
+        Date endDate = setEndDate(endYear);
+        data = queryProtectArea(countyCodes, protectedObjects, startDate, endDate, page, limit);
+
+        JSONArray provinceData = new JSONArray();
+        List<String> provinceList = new ArrayList<>();
+        List<Integer> provinceCountList = new ArrayList<>();
+        List<Double> provinceAreaList = new ArrayList<>();
+
+        JSONArray protectedObjectsData = new JSONArray();
+        List<String> protectedObjectsList = new ArrayList<>();
+        List<Integer> protectedObjectsCountList = new ArrayList<>();
+        List<Double> protectedObjectsAreaList = new ArrayList<>();
+
+        for(int i=0;i<data.size();i++){
+            // province
+            String provinceName = data.get(i).getProvince().trim();
+            String protectedObjectsString = data.get(i).getProtectedObjects().trim();
+            long id = data.get(i).getId();
+            double currentArea = data.get(i).getCurrentArea();
+
+            if(!provinceList.contains(provinceName)){
+                provinceList.add(provinceName);
+                provinceCountList.add(1);
+                provinceAreaList.add(currentArea);
+            }
+            else{
+                int index = provinceList.indexOf(provinceName);
+                provinceCountList.set(index, provinceCountList.get(index) + 1);
+                double beforeArea = provinceAreaList.get(index);
+                double area = currentArea + beforeArea;
+                provinceAreaList.set(index, area);
+            }
+
+            // protectedObjects
+            if(!protectedObjectsList.contains(protectedObjectsString)){
+                protectedObjectsList.add(protectedObjectsString);
+                protectedObjectsCountList.add(1);
+                protectedObjectsAreaList.add(currentArea);
+            }
+            else{
+                int index = protectedObjectsList.indexOf(protectedObjectsString);
+                protectedObjectsCountList.set(index, protectedObjectsCountList.get(index) + 1);
+                double beforeArea = protectedObjectsAreaList.get(index);
+                double area = currentArea + beforeArea;
+                protectedObjectsAreaList.set(index, area);
+            }
+        }
+
+        for(int i=0; i<provinceList.size();i++){
+            provinceData.add(JSONObject.parse("{'province': '" + provinceList.get(i) + "', 'count': " + provinceCountList.get(i) + ", 'area': " + provinceAreaList.get(i) + "}"));
+        }
+
+        for(int i=0; i<protectedObjectsList.size();i++){
+            protectedObjectsData.add(JSONObject.parse("{'protectedObjects': '" + protectedObjectsList.get(i) + "', 'count': " + protectedObjectsCountList.get(i) + ", 'area': " + String.format("%.2f", protectedObjectsAreaList.get(i)) + "}"));
+        }
+
+        JSONObject result = new JSONObject();
+        result.put("provinceData", provinceData);
+        result.put("protectedObjectsData", protectedObjectsData);
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/query4Table", produces = "application/json;charset=UTF-8")
+    public LayuiTableDataVO query4Table(
+            @RequestParam(defaultValue = "") String regionType,
+            @RequestParam(defaultValue = "") String province,
+            @RequestParam(defaultValue = "") String city,
+            @RequestParam(defaultValue = "") String county,
+            @RequestParam(defaultValue = "") String topic,
+            @RequestParam(defaultValue = "") String subTopic,
+            @RequestParam(defaultValue = "") String protectedObjects,
+            @RequestParam(defaultValue = "-1") int startYear,
+            @RequestParam(defaultValue = "-1") int endYear,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int limit
+    ){
+        List<ProtectArea> data = null;
+        long count = 0;
+        List<String> countyCodes = null;
+
+        try {
+            // 区域
+            if("district".equals(regionType)){
+                countyCodes = queryDistrictAdcode(province, city, county);
+            }
+            // 专题
+            else if("topic".equals(regionType)){
+                countyCodes = queryStatTopicsAdcode(topic, subTopic);
+            }
+
+            protectedObjects = "%" + protectedObjects + "%";
+            Date startDate = setStartDate(startYear);
+            Date endDate = setEndDate(endYear);
+            data = queryProtectArea(countyCodes, protectedObjects, startDate, endDate, page, limit);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        LayuiTableDataVO result = new LayuiTableDataVO();
+        result.setCode(0);
+        result.setMsg("");
+        result.setCount(count);
+        result.setData(data);
+        return result;
+    }
+
+
     private List<String> queryDistrictAdcode(String provinceCode, String cityCode, String countyCode){
         List<String> adcodeList = new ArrayList<>();
         Set<String> adcodeSet = new HashSet<>();
@@ -131,12 +270,20 @@ public class ProtectAreaJsonController {
         return adcodeList;
     }
 
-    private List<ProtectArea> queryProtectArea(List<String> adcodes, String protectedObjects, Date startDate, Date endDate){
+    private List<ProtectArea> queryProtectArea(List<String> adcodes,
+                                               String protectedObjects,
+                                               Date startDate,
+                                               Date endDate,
+                                               int page,
+                                               int limit){
+        int offset = (page - 1) * limit;
+        if(limit == 0) limit = Integer.MAX_VALUE;
+
         if(adcodes.size() > 0){
-            return protectAreaService.findAll(adcodes, protectedObjects, startDate, endDate);
+            return protectAreaService.findAll(adcodes, protectedObjects, startDate, endDate, offset, limit);
         }
         else{
-            return protectAreaService.findAll(protectedObjects, startDate, endDate);
+            return protectAreaService.findAll(protectedObjects, startDate, endDate, offset, limit);
         }
     }
 
@@ -172,135 +319,4 @@ public class ProtectAreaJsonController {
         return calendar.getTime();
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/query4Chart", produces = "application/json;charset=UTF-8")
-    public JSONObject query4Chart(
-            @RequestParam String regionType,
-            @RequestParam(defaultValue = "") String province,
-            @RequestParam(defaultValue = "") String city,
-            @RequestParam(defaultValue = "") String county,
-            @RequestParam(defaultValue = "") String topic,
-            @RequestParam(defaultValue = "") String subTopic,
-            @RequestParam(defaultValue = "") String protectedObjects,
-            @RequestParam(defaultValue = "-1") int startYear,
-            @RequestParam(defaultValue = "-1") int endYear
-    ){
-        List<ProtectArea> data = null;
-        long count = 0;
-        List<String> countyCodes = null;
-
-        // 区域
-        if("district".equals(regionType)){
-            countyCodes = queryDistrictAdcode(province, city, county);
-        }
-        // 专题
-        else if("topic".equals(regionType)){
-            countyCodes = queryStatTopicsAdcode(topic, subTopic);
-        }
-
-        protectedObjects = "%" + protectedObjects + "%";
-        Date startDate = setStartDate(startYear);
-        Date endDate = setEndDate(endYear);
-        data = queryProtectArea(countyCodes, protectedObjects, startDate, endDate);
-
-        JSONArray provinceData = new JSONArray();
-        List<String> provinceList = new ArrayList<>();
-        List<Integer> provinceCountList = new ArrayList<>();
-        List<Double> provinceAreaList = new ArrayList<>();
-
-        JSONArray protectedObjectsData = new JSONArray();
-        List<String> protectedObjectsList = new ArrayList<>();
-        List<Integer> protectedObjectsCountList = new ArrayList<>();
-        List<Double> protectedObjectsAreaList = new ArrayList<>();
-
-        for(int i=0;i<data.size();i++){
-            // province
-            String provinceName = data.get(i).getProvince().trim();
-            String protectedObjectsString = data.get(i).getProtectedObjects().trim();
-            long id = data.get(i).getId();
-            double currentArea = data.get(i).getCurrentArea();
-
-            if(!provinceList.contains(provinceName)){
-                provinceList.add(provinceName);
-                provinceCountList.add(1);
-                provinceAreaList.add(currentArea);
-            }
-            else{
-                int index = provinceList.indexOf(provinceName);
-                provinceCountList.set(index, provinceCountList.get(index) + 1);
-                provinceAreaList.set(index, provinceAreaList.get(index) + currentArea);
-            }
-
-            // protectedObjects
-            if(!protectedObjectsList.contains(protectedObjectsString)){
-                protectedObjectsList.add(protectedObjectsString);
-                protectedObjectsCountList.add(1);
-                protectedObjectsAreaList.add(currentArea);
-            }
-            else{
-                int index = protectedObjectsList.indexOf(protectedObjectsString);
-                protectedObjectsCountList.set(index, protectedObjectsCountList.get(index) + 1);
-                double beforeArea = protectedObjectsAreaList.get(index);
-                double area = currentArea + beforeArea;
-                protectedObjectsAreaList.set(index, area);
-            }
-        }
-
-        for(int i=0; i<provinceList.size();i++){
-            provinceData.add(JSONObject.parse("{'province': '" + provinceList.get(i) + "', 'count': " + provinceCountList.get(i) + ", 'area': " + provinceAreaList.get(i) + "}"));
-        }
-
-        for(int i=0; i<protectedObjectsList.size();i++){
-            protectedObjectsData.add(JSONObject.parse("{'protectedObjects': '" + protectedObjectsList.get(i) + "', 'count': " + protectedObjectsCountList.get(i) + ", 'area': " + String.format("%.2f", protectedObjectsAreaList.get(i)) + "}"));
-        }
-
-        JSONObject result = new JSONObject();
-        result.put("provinceData", provinceData);
-        result.put("protectedObjectsData", protectedObjectsData);
-        return result;
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/query4Table", produces = "application/json;charset=UTF-8")
-    public LayuiTableDataVO query4Table(
-            @RequestParam(defaultValue = "") String regionType,
-            @RequestParam(defaultValue = "") String province,
-            @RequestParam(defaultValue = "") String city,
-            @RequestParam(defaultValue = "") String county,
-            @RequestParam(defaultValue = "") String topic,
-            @RequestParam(defaultValue = "") String subTopic,
-            @RequestParam(defaultValue = "") String protectedObjects,
-            @RequestParam(defaultValue = "-1") int startYear,
-            @RequestParam(defaultValue = "-1") int endYear
-    ){
-        List<ProtectArea> data = null;
-        long count = 0;
-        List<String> countyCodes = null;
-
-        try {
-            // 区域
-            if("district".equals(regionType)){
-                countyCodes = queryDistrictAdcode(province, city, county);
-            }
-            // 专题
-            else if("topic".equals(regionType)){
-                countyCodes = queryStatTopicsAdcode(topic, subTopic);
-            }
-
-            protectedObjects = "%" + protectedObjects + "%";
-            Date startDate = setStartDate(startYear);
-            Date endDate = setEndDate(endYear);
-            data = queryProtectArea(countyCodes, protectedObjects, startDate, endDate);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-
-        LayuiTableDataVO result = new LayuiTableDataVO();
-        result.setCode(0);
-        result.setMsg("");
-        result.setCount(count);
-        result.setData(data);
-        return result;
-    }
 }

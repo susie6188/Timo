@@ -83,9 +83,9 @@ public class ProtectAreaServiceImpl implements ProtectAreaService {
     }
 
     @Override
-    public List<ProtectArea> findAll(List<String> adcodes, String protectedObjects, Date startDate, Date endDate) {
+    public List<ProtectArea> findAll(List<String> adcodes, String protectedObjects, Date startDate, Date endDate, int offset, int limit) {
         String adcodesStr = String.join(",", adcodes);
-        List<IProtectAreaTO> objects = protectAreaRepository.findAll(adcodes, protectedObjects, startDate, endDate);
+        List<IProtectAreaTO> objects = protectAreaRepository.findAll(adcodes, protectedObjects, startDate, endDate, offset, limit);
 
         List<ProtectArea> result = new ArrayList<ProtectArea>();
         for(int i=0;i<objects.size();i++){
@@ -97,8 +97,8 @@ public class ProtectAreaServiceImpl implements ProtectAreaService {
     }
 
     @Override
-    public List<ProtectArea> findAll(String protectedObjects, Date startDate, Date endDate) {
-        List<IProtectAreaTO> objects = protectAreaRepository.findAll(protectedObjects, startDate, endDate);
+    public List<ProtectArea> findAll(String protectedObjects, Date startDate, Date endDate, int offset, int limit) {
+        List<IProtectAreaTO> objects = protectAreaRepository.findAll(protectedObjects, startDate, endDate, offset, limit);
 
         List<ProtectArea> result = new ArrayList<ProtectArea>();
         for(int i=0;i<objects.size();i++){
