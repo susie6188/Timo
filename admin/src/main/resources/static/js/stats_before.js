@@ -143,7 +143,7 @@ layui.config({
         // 请求图数据
         $.ajax({
             type: "GET",
-            url: "/protectArea/json/query4Chart",
+            url: "/protectAreaBefore/json/query4Chart",
             data: {
                 regionType: regionType,
                 province: province,
@@ -193,7 +193,6 @@ layui.config({
                                 // for (var i = 0; i < params.length; i++) {
                                 //     res += "<br>"+params[i].marker+params[i].seriesName+"："+ params[i].data.toFixed(2);
                                 // }
-
                                 return res;
                             }
                         },
@@ -292,7 +291,6 @@ layui.config({
                                 // for (var i = 0; i < params.length; i++) {
                                 //     res += "<br>"+params[i].marker+params[i].seriesName+"："+ params[i].data.toFixed(2);
                                 // }
-
                                 return res;
                             }
                         },
@@ -362,7 +360,7 @@ layui.config({
         // 刷新表数据
         var detailTitle = titleYear + titleRegion + '自然保护地详情';
         $("#detailTableTitle").text(detailTitle);
-        detailTableOption.url="/protectArea/json/query4Table?" +
+        detailTableOption.url="/protectAreaBefore/json/query4Table?" +
             "regionType=" + regionType +
             "&province=" + province +
             "&city=" + city +
@@ -487,7 +485,7 @@ function loadTopics(){
 function showWeight() {
     $.ajax({
         type: "GET",
-        url: "protectArea/json/levelData",
+        url: "protectAreaBefore/json/levelData",
         data: {},
         success: function (r) {
             //console.log(r)

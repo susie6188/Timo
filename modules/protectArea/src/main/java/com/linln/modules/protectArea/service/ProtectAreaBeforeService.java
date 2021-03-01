@@ -1,11 +1,13 @@
 package com.linln.modules.protectArea.service;
 
 import com.linln.common.enums.StatusEnum;
+import com.linln.modules.protectArea.domain.ProtectArea;
 import com.linln.modules.protectArea.domain.ProtectAreaBefore;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,5 +41,20 @@ public interface ProtectAreaBeforeService {
     @Transactional
     Boolean updateStatus(StatusEnum statusEnum, List<Long> idList);
 
+    /**
+     * 查询保护地级别
+     * @return
+     */
     List getLevel();
+
+    /**
+     * 查询保护地类别
+     * @return
+     */
+    List getCategory();
+
+    List<ProtectAreaBefore> findAll();
+
+    List<ProtectAreaBefore> findAll(List<String> adcodes, String protectedObjects, Date startDate, Date endDate, int offset, int limit);
+    List<ProtectAreaBefore> findAll(String protectedObjects, Date startDate, Date endDate, int offset, int limit);
 }

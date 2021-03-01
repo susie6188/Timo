@@ -3,24 +3,15 @@ package com.linln.admin.protectArea.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.linln.modules.protectArea.domain.*;
-import com.linln.modules.protectArea.domain.LayuiTableDataVO;
-import com.linln.modules.protectArea.domain.ProtectArea;
-import com.linln.modules.protectArea.domain.StatTopics;
 import com.linln.modules.protectArea.repository.AdcodeRepository;
+import com.linln.modules.protectArea.repository.ProtectAreaBeforeRepository;
 import com.linln.modules.protectArea.repository.ProtectAreaRepository;
-import com.linln.modules.protectArea.service.AdcodeService;
+import com.linln.modules.protectArea.service.ProtectAreaBeforeService;
 import com.linln.modules.protectArea.service.ProtectAreaService;
 import com.linln.modules.protectArea.service.impl.AdcodeServiceImpl;
 import com.linln.modules.protectArea.service.impl.StatTopicsServiceImpl;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.mysql.cj.xdevapi.JsonArray;
-import net.sf.ehcache.util.LargeSet;
-import netscape.javascript.JSException;
-import netscape.javascript.JSObject;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -29,25 +20,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.RequestContextUtils;
-import springfox.documentation.spring.web.json.Json;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @RestController
-@RequestMapping("protectArea/json")
-public class ProtectAreaJsonController {
-
+@RequestMapping("protectAreaBefore/json")
+public class PretectAreaBeforeJsonController {
     @Autowired
     private AdcodeServiceImpl adcodeService;
 
     @Autowired
-    private ProtectAreaService protectAreaService;
+    private ProtectAreaBeforeService protectAreaBeforeService;
 
     @Autowired
-    private ProtectAreaRepository protectAreaRepository;
+    private ProtectAreaBeforeRepository protectAreaBeforeRepository;
 
     @Autowired
     private StatTopicsServiceImpl statTopicsService;
@@ -59,9 +45,9 @@ public class ProtectAreaJsonController {
      * 数据列表
      */
     @RequestMapping("/list")
-    @RequiresPermissions("protectArea:protectArea:detail")
-    public List getData(Model model){
-        ProtectArea protectArea = new ProtectArea();
+    @RequiresPermissions("protectArea:protectAreaBefore:list")
+    public List getDataBefore(Model model){
+        ProtectAreaBefore protectAreaBefore = new ProtectAreaBefore();
         // 创建匹配器，进行动态查询匹配
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher("name", match -> match.contains())
@@ -72,63 +58,17 @@ public class ProtectAreaJsonController {
                 .withMatcher("nameBefore", match -> match.contains());
 
         // 获取数据列表
-        Example<ProtectArea> example = Example.of(protectArea, matcher);
-        Page<ProtectArea> list = protectAreaService.getPageList(example);
+        Example<ProtectAreaBefore> example = Example.of(protectAreaBefore, matcher);
+        Page<ProtectAreaBefore> list = protectAreaBeforeService.getPageList(example);
         List datalist = list.getContent();
         return datalist;
     }
 
-//    @RequestMapping("/levelData")
-//    //@RequiresPermissions("protectArea:protectArea:detail")
-//    public Map getDataByLevel(Model model){
-//        Map map = new HashMap<String,Object>();
-//
-//
-//
-//        HashMap<String,List> map2 = new HashMap<String, List>();
-//
-//        List levelList = protectAreaService.getLevel();
-//        List datalist = new ArrayList();
-//        List datalist2 = protectAreaRepository.getAreaStatsByLevel();
-//        List categoryList = protectAreaRepository.getCategory();
-//        List areaListByCategory = new ArrayList();
-//
-//        Iterator<String> it = levelList.iterator();
-//        while (it.hasNext()){
-//            String level = it.next();
-//            datalist.add(protectAreaRepository.getAreaStatsByLevel(level));
-//        }
-//
-//        List areaList = new ArrayList();
-//        it = categoryList.iterator();
-//        while (it.hasNext()){
-//            HashMap<String,String> mapAreaGroupByCategory = new HashMap<String,String>();
-//            String category = it.next();
-//            //areaListByCategory.add(protectAreaRepository.getAreaStatsByCategory(category));
-//            mapAreaGroupByCategory.put("category",category);
-//            mapAreaGroupByCategory.put("area",protectAreaRepository.getAreaStatsByCategory(category));
-//            areaList.add(mapAreaGroupByCategory);
-//        }
-//
-//
-////        map2.put("category",levelList);
-////        map2.put("data",datalist);
-////        map2.put("data2",datalist2);
-//        map2.put("counts",areaListByCategory);
-////        map2.put("areaListByCategory",areaListByCategory);
-//
-//
-//        map.put("code","0");
-//        map.put("msg","");
-//        map.put("count","");
-//        map.put("data",areaList);
-//        return map;
-//    }
 
 
     @RequestMapping("/paCount")
-    public List getPaCountData(Model model){
-        ProtectArea protectArea = new ProtectArea();
+    public List getPaCountDataBefore(Model model){
+        ProtectAreaBefore protectAreaBefore = new ProtectAreaBefore();
         // 创建匹配器，进行动态查询匹配
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher("name", match -> match.contains())
@@ -139,15 +79,15 @@ public class ProtectAreaJsonController {
                 .withMatcher("nameBefore", match -> match.contains());
 
         // 获取数据列表
-        Example<ProtectArea> example = Example.of(protectArea, matcher);
-        Page<ProtectArea> list = protectAreaService.getPageList(example);
+        Example<ProtectAreaBefore> example = Example.of(protectAreaBefore, matcher);
+        Page<ProtectAreaBefore> list = protectAreaBeforeService.getPageList(example);
         List datalist = list.getContent();
         return datalist;
     }
 
     @ResponseBody
     @RequestMapping(value = "/query4Chart", produces = "application/json;charset=UTF-8")
-    public JSONObject query4Chart(
+    public JSONObject query4ChartBefore(
             @RequestParam String regionType,
             @RequestParam(defaultValue = "") String province,
             @RequestParam(defaultValue = "") String city,
@@ -160,10 +100,17 @@ public class ProtectAreaJsonController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "0") int limit
     ){
-        List<ProtectArea> data = null;
+        List<ProtectAreaBefore> data = null;
         long count = 0;
         List<String> countyCodes = null;
-
+        System.out.println("--------------");
+        System.out.println("regionType="+regionType);
+        System.out.println("province="+province);
+        System.out.println("city="+city);
+        System.out.println("county="+county);
+        System.out.println("topic="+topic);
+        System.out.println("subTopic="+subTopic);
+        System.out.println("protectedObjects="+protectedObjects);
         // 区域
         if("district".equals(regionType)){
             countyCodes = queryDistrictAdcode(province, city, county);
@@ -172,11 +119,14 @@ public class ProtectAreaJsonController {
         else if("topic".equals(regionType)){
             countyCodes = queryStatTopicsAdcode(topic, subTopic);
         }
+        System.out.println(countyCodes.size());
 
         protectedObjects = "%" + protectedObjects + "%";
         Date startDate = setStartDate(startYear);
         Date endDate = setEndDate(endYear);
         data = queryProtectArea(countyCodes, protectedObjects, startDate, endDate, page, limit);
+
+        System.out.println(data.size());
 
         JSONArray provinceData = new JSONArray();
         List<String> provinceList = new ArrayList<>();
@@ -243,7 +193,7 @@ public class ProtectAreaJsonController {
 
     @ResponseBody
     @RequestMapping(value = "/query4Table", produces = "application/json;charset=UTF-8")
-    public LayuiTableDataVO query4Table(
+    public LayuiTableDataVO query4TableBefore(
             @RequestParam(defaultValue = "") String regionType,
             @RequestParam(defaultValue = "") String province,
             @RequestParam(defaultValue = "") String city,
@@ -256,7 +206,7 @@ public class ProtectAreaJsonController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "0") int limit
     ){
-        List<ProtectArea> data = null;
+        List<ProtectAreaBefore> data = null;
         long count = 0;
         List<String> countyCodes = null;
 
@@ -279,6 +229,8 @@ public class ProtectAreaJsonController {
         catch (Exception e){
             e.printStackTrace();
         }
+        //title
+        String title = getTitle(province,city,county);
 
         LayuiTableDataVO result = new LayuiTableDataVO();
         result.setCode(0);
@@ -336,7 +288,7 @@ public class ProtectAreaJsonController {
         return adcodeList;
     }
 
-    private List<ProtectArea> queryProtectArea(List<String> adcodes,
+    private List<ProtectAreaBefore> queryProtectArea(List<String> adcodes,
                                                String protectedObjects,
                                                Date startDate,
                                                Date endDate,
@@ -345,11 +297,13 @@ public class ProtectAreaJsonController {
         int offset = (page - 1) * limit;
         if(limit == 0) limit = Integer.MAX_VALUE;
 
+        System.out.println("protectedObjects="+protectedObjects);
+
         if(adcodes.size() > 0){
-            return protectAreaService.findAll(adcodes, protectedObjects, startDate, endDate, offset, limit);
+            return protectAreaBeforeService.findAll(adcodes, protectedObjects, startDate, endDate, offset, limit);
         }
         else{
-            return protectAreaService.findAll(protectedObjects, startDate, endDate, offset, limit);
+            return protectAreaBeforeService.findAll(protectedObjects, startDate, endDate, offset, limit);
         }
     }
 
@@ -401,5 +355,4 @@ public class ProtectAreaJsonController {
         }
         return title;
     }
-
 }

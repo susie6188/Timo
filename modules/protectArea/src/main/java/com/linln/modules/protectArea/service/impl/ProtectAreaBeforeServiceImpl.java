@@ -2,11 +2,14 @@ package com.linln.modules.protectArea.service.impl;
 
 import com.linln.common.data.PageSort;
 import com.linln.common.enums.StatusEnum;
+import com.linln.modules.protectArea.domain.IProtectAreaTO;
+import com.linln.modules.protectArea.domain.ProtectArea;
 import com.linln.modules.protectArea.domain.ProtectAreaBefore;
 import com.linln.modules.protectArea.repository.ProtectAreaBeforeRepository;
 import com.linln.modules.protectArea.service.ProtectAreaBeforeService;
 import com.linln.modules.system.service.DictService;
 import jdk.nashorn.internal.ir.ReturnNode;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -69,9 +73,46 @@ public class ProtectAreaBeforeServiceImpl implements ProtectAreaBeforeService {
     }
 
     @Override
-    public List getLevel(){
-        List list= new ArrayList();
-
-        return null;
+    public List getLevel() {
+        return protectAreaBeforeRepository.getLevel();
     }
+
+    @Override
+    public List<ProtectAreaBefore> findAll() {
+        return protectAreaBeforeRepository.findAll();
+    }
+
+    @Override
+    public List<ProtectAreaBefore> findAll(List<String> adcodes, String protectedObjects, Date startDate, Date endDate, int offset, int limit) {
+        String adcodesStr = String.join(",", adcodes);
+        List<IProtectAreaTO> objects = protectAreaBeforeRepository.findAll(adcodes, protectedObjects, startDate, endDate, offset, limit);
+
+        List<ProtectAreaBefore> result = new ArrayList<ProtectAreaBefore>();
+        for(int i=0;i<objects.size();i++){
+            ProtectAreaBefore protectAreaBefore = new ProtectAreaBefore();
+            BeanUtils.copyProperties(objects.get(i), protectAreaBefore);
+            result.add(protectAreaBefore);
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProtectAreaBefore> findAll(String protectedObjects, Date startDate, Date endDate, int offset, int limit) {
+        List<IProtectAreaTO> objects = protectAreaBeforeRepository.findAll(protectedObjects, startDate, endDate, offset, limit);
+
+        List<ProtectAreaBefore> result = new ArrayList<ProtectAreaBefore>();
+        for(int i=0;i<objects.size();i++){
+            ProtectAreaBefore protectAreaBefore = new ProtectAreaBefore();
+            BeanUtils.copyProperties(objects.get(i), protectAreaBefore);
+            result.add(protectAreaBefore);
+        }
+        return result;
+    }
+
+
+    @Override
+    public List getCategory() {
+        return protectAreaBeforeRepository.getCategory();
+    }
+
 }

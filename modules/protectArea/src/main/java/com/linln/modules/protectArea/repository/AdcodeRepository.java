@@ -14,6 +14,27 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AdcodeRepository extends JpaRepository<Adcode, Long> {
+    @Query(nativeQuery = true,value = "" +
+            "select * from adcode" +
+            " where province_code = :provinceCode" +
+            " limit 1"
+    )
+    List<Adcode> findByProvinceCode(@Param("provinceCode") String provinceCode);
+
+    @Query(nativeQuery = true,value = "" +
+            "select * from adcode" +
+            " where city_code = :cityCode" +
+            " limit 1"
+    )
+    List<Adcode> findByCityCode(@Param("cityCode") String cityCode);
+
+    @Query(nativeQuery = true,value = "" +
+            "select * from adcode" +
+            " where county_code = :countyCode" +
+            " limit 1"
+    )
+    List<Adcode> findByCountyCode(@Param("countyCode") String countyCode);
+
     @Query(nativeQuery = true, value = "select distinct province as name, province_code as code from adcode")
     List<IAdcodeTO> findProvinces();
 

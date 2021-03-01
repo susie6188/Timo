@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.linln.modules.protectArea.domain.*;
-import com.linln.modules.protectArea.service.impl.AdcodeServiceImpl;
-import com.linln.modules.protectArea.service.impl.AreaServiceImpl;
-import com.linln.modules.protectArea.service.impl.ProtectAreaServiceImpl;
-import com.linln.modules.protectArea.service.impl.StatTopicsServiceImpl;
+import com.linln.modules.protectArea.service.impl.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +22,9 @@ public class BootApplicationTests {
 
     @Autowired
     ProtectAreaServiceImpl protectAreaService;
+
+    @Autowired
+    ProtectAreaBeforeServiceImpl protectAreaBeforeService;
 
     @Autowired
     StatTopicsServiceImpl statTopicsService;
@@ -209,4 +209,47 @@ public class BootApplicationTests {
             statTopicsService.save(statTopics);
         }
     }
+
+    @Test
+    public void parseProtectedAreaBefore(){
+        List<ProtectAreaBefore> protectAreas = protectAreaBeforeService.findAll();
+        for(int i=0;i<protectAreas.size();i++){
+            ProtectAreaBefore protectAreaBefore = protectAreas.get(i);
+
+            int locationCount = 0;
+            List<ProjectAreaBeforeLocation> locations = new ArrayList<ProjectAreaBeforeLocation>();
+            String[] provinces = {};
+            String[] cities = {};
+            String[] counties = {};
+            if(protectAreaBefore.getProvince() != null) provinces = protectAreaBefore.getProvince().split(",");
+            if(protectAreaBefore.getCity() != null) cities = protectAreaBefore.getCity().split(",");
+            if(protectAreaBefore.getCounty() != null) counties = protectAreaBefore.getCounty().split(",");
+//            System.out.println(provinces.length + "-" + cities.length + "-" + counties.length);
+
+            for(int provinceIndex = 0;provinceIndex<provinces.length;provinceIndex++){
+                for(int cityIndex = 0;cityIndex<cities.length;cityIndex++){
+                    for(int countyIndex = 0;countyIndex<counties.length;countyIndex++){
+                        List<Adcode> adcodes = adcodeService.findAllByProvinceAndCityAndCounty(provinces[provinceIndex], cities[cityIndex], counties[countyIndex]);
+
+                        for(int adcodeIndex =0; adcodeIndex < adcodes.size(); adcodeIndex++){
+                            Adcode adcode = adcodes.get(adcodeIndex);
+                            ProjectAreaBeforeLocation location = new ProjectAreaBeforeLocation();
+                            location.setAdcode(adcode.getCountyCode());
+                            location.setProtectAreaBefore(protectAreaBefore);
+                            locations.add(location);
+                            locationCount++;
+                        }
+                    }
+                }
+            }
+
+            protectAreaBefore.setLocations(locations);
+            protectAreaBefore.setLocationCount(locationCount);
+
+            System.out.println((i + 1) + "/" + protectAreas.size() + ": " + protectAreaBefore.getProvince() + "-" + protectAreaBefore.getCity() + "-" + protectAreaBefore.getCounty() + " " + locationCount);
+
+            protectAreaBeforeService.save(protectAreaBefore);
+        }
+    }
+
 }

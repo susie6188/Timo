@@ -6,8 +6,13 @@ import com.linln.common.utils.EntityBeanUtil;
 import com.linln.common.utils.ResultVoUtil;
 import com.linln.common.utils.StatusUtil;
 import com.linln.common.vo.ResultVo;
+import com.linln.component.excel.ExcelUtil;
+import com.linln.component.fileUpload.FileUpload;
+import com.linln.modules.protectArea.domain.ProtectArea;
 import com.linln.modules.protectArea.domain.ProtectAreaBefore;
+import com.linln.modules.protectArea.repository.ProtectAreaBeforeRepository;
 import com.linln.modules.protectArea.service.ProtectAreaBeforeService;
+import com.linln.modules.system.domain.Upload;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -15,9 +20,16 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.ResourceUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -30,6 +42,8 @@ public class ProtectAreaBeforeController {
 
     @Autowired
     private ProtectAreaBeforeService protectAreaBeforeService;
+    @Autowired
+    private ProtectAreaBeforeRepository protectAreaBeforeRepository;
 
     /**
      * 列表页面
@@ -121,4 +135,123 @@ public class ProtectAreaBeforeController {
             return ResultVoUtil.error(statusEnum.getMessage() + "失败，请重新操作");
         }
     }
+
+    /**
+     * 生成excel模版并下载
+     */
+    @RequestMapping("/excel/template")
+    @RequiresPermissions("protectArea:protectAreaBefore:add")
+    @ResponseBody
+    public void genExcelTemplate(){
+        try {
+            ExcelUtil.genTemplate(Class.forName("com.linln.modules.protectArea.domain.ProtectAreaBefore"));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * TODO
+     * 增加根据用户权限范围导出数据
+     * 增加根据查询条件导出查询结果数据
+     *
+     */
+
+    /**
+     * 导出excel
+     */
+    @RequestMapping("/excel/export")
+    @RequiresPermissions("protectArea:protectAreaBefore:add")
+    @ResponseBody
+    public void exportExcel(ProtectAreaBefore protectAreaBefore){
+        //ProtectAreaBefore protectAreaBefore = new ProtectAreaBefore();
+        // 创建匹配器，进行动态查询匹配
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withMatcher("name", match -> match.contains())
+                .withMatcher("protectedObjects", match -> match.contains())
+                .withMatcher("institutionLevel", match -> match.contains())
+                .withMatcher("institutionName", match -> match.contains())
+                .withMatcher("institutionAffiliation", match -> match.contains())
+                .withMatcher("nameBefore", match -> match.contains());
+
+        // 获取数据列表
+        Example<ProtectAreaBefore> example = Example.of(protectAreaBefore, matcher);
+
+        List<ProtectAreaBefore> datalist = protectAreaBeforeRepository.findAll(example);
+        //List datalist = (List) protectAreaService.getById(Long.valueOf(1));
+        //System.out.println(datalist);
+        try {
+            ExcelUtil.exportExcel(Class.forName("com.linln.modules.protectArea.domain.ProtectAreaBefore"),datalist,"整合优化前保护地数据");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        //return ResultVoUtil.success("成功下载");
+    }
+
+    /**
+     * 导入excel
+     */
+    @RequestMapping("/excel/import")
+    @RequiresPermissions("protectArea:protectAreaBefore:add")
+    @ResponseBody
+    public void importExcel(){
+        try {
+            String path = FileUpload.getPathPattern();
+            File cfgFile;
+            cfgFile = ResourceUtils.getFile( path+"/test.xlsx");
+            InputStream inputStream = new FileInputStream(cfgFile);
+            ExcelUtil.importExcel(Class.forName("com.linln.modules.protectArea.domain.ProtectAreaBefore"), inputStream);
+        }catch (ClassNotFoundException | FileNotFoundException e){
+            e.printStackTrace();
+        }
+    }
+    @RequestMapping("/excel/upload")
+    @RequiresPermissions("protectArea:protectAreaBefore:add")
+    @ResponseBody
+    public ResultVo uploadFile(@RequestParam("myfile") MultipartFile multipartFile) throws IOException {
+
+        // 创建Upload实体对象
+        Upload upload = FileUpload.getFile(multipartFile, "/upload");
+
+        // 保存文件到指定路径
+        multipartFile.transferTo(FileUpload.getDestFile(upload));
+
+        // 保存文件上传信息
+        //uploadService.save(upload);
+
+        File file = FileUpload.getDestFile(upload);
+        InputStream inputStream = new FileInputStream(file);
+        try {
+            if(!ExcelUtil.validateTemplate(Class.forName("com.linln.modules.protectArea.domain.ProtectAreaBefore"), inputStream)){
+                return ResultVoUtil.error("该Excel文件模版不合法，必须使用系统导出的模版填写数据，请检查文件！");
+            }else {
+                inputStream = new FileInputStream(file);
+                List<?> list = ExcelUtil.importExcel(Class.forName("com.linln.modules.protectArea.domain.ProtectAreaBefore"), inputStream);
+                for(Object pa:list){
+                    System.out.println((ProtectAreaBefore)pa);
+                    protectAreaBeforeService.save((ProtectAreaBefore) pa);
+                }
+            }
+
+        }catch (ClassNotFoundException  e){
+            e.printStackTrace();
+        }
+
+
+        return ResultVoUtil.success(upload);
+    }
+
+    @GetMapping("/upload")
+    @RequiresPermissions("protectArea:protectAreaBefore:add")
+    public String upload() {
+        return "/protectArea/protectAreaBefore/import";
+    }
+
+    @GetMapping("stats")
+    @RequiresPermissions("protectArea:protectAreaBefore:stats")
+    public String stats(ModelMap model){
+        return "/protectArea/protectAreaBefore/stats";
+    }
+
+
 }
