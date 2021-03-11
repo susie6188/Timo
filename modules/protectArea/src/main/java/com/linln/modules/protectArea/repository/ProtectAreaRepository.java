@@ -37,6 +37,7 @@ public interface ProtectAreaRepository extends BaseRepository<ProtectArea, Long>
     List getAreaStatsByLevel();
 
     @Query(nativeQuery = true, value = "SELECT " +
+            "distinct " +
             "t1.id, " +
             "t1.name, " +
             "t1.level, " +
@@ -75,9 +76,9 @@ public interface ProtectAreaRepository extends BaseRepository<ProtectArea, Long>
             "t1.update_date as updateDate, " +
             "t1.status, " +
             "t1.location_count as locationCount " +
-            "FROM pa_protect_area t1, pa_location t2 where " +
-            "t1.id = t2.protect_area_id and " +
-            "t1.protected_objects like :protectedObjects and " +
+            "FROM pa_protect_area t1 left join pa_location t2 " +
+            "on t1.id = t2.protect_area_id " +
+            "where t1.protected_objects like :protectedObjects and " +
             "((t1.reply_time >= :startDate and t1.reply_time <= :endDate) or (t1.reply_time is null)) and " +
             "t2.adcode in (:adcodes) " +
             "limit :limit " +
@@ -91,6 +92,7 @@ public interface ProtectAreaRepository extends BaseRepository<ProtectArea, Long>
                                  @Param(value = "limit") int limit);
 
     @Query(nativeQuery = true, value = "SELECT " +
+            "distinct " +
             "t1.id, " +
             "t1.name, " +
             "t1.level, " +
